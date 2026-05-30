@@ -7,10 +7,12 @@ import { summary } from "../assets/data";
 import clsx from "clsx";
 import { Chart } from "../components/Chart";
 import { TaskTable, UserTable } from "../components/dashboard";
+import { useSelector } from "react-redux";
 import { useGetUsersQuery } from "../redux/slices/userApiSlice";
 
 const Dashboard = () => {
-  const { data: usersData } = useGetUsersQuery();
+  const { user } = useSelector((state) => state.auth);
+  const { data: usersData } = useGetUsersQuery(undefined, { skip: !user?.isAdmin });
   const totals = summary.tasks;
 
   const stats = [
@@ -82,11 +84,13 @@ const Dashboard = () => {
       <div className="w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8">
         {/* /left */}
 
-        <TaskTable tasks={summary.last10Task} />
+        <TaskTable tasks={summary.last10Task} isFullWidth={!user?.isAdmin} />
 
         {/* /right */}
 
-        <UserTable users={usersData?.data || summary.users} />
+        {user?.isAdmin && (
+          <UserTable users={usersData?.data || summary.users} />
+        )}
       </div>
     </div>
   );

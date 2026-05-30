@@ -9,7 +9,7 @@ import moment from "moment";
 import { BGS, PRIOTITYSTYELS, TASK_TYPE, PRIORITY_THAI } from "../../utils";
 import UserInfo from "../UserInfo";
 
-const TaskTable = ({ tasks }) => {
+const TaskTable = ({ tasks, isFullWidth }) => {
   const ICONS = {
     high: <MdKeyboardDoubleArrowUp />,
     medium: <MdKeyboardArrowUp />,
@@ -72,7 +72,12 @@ const TaskTable = ({ tasks }) => {
   );
   return (
     <>
-      <div className='w-full md:w-2/3 bg-white px-2 md:px-4 pt-4 pb-4 shadow-md rounded'>
+      <div
+        className={clsx(
+          "bg-white px-2 md:px-4 pt-4 pb-4 shadow-md rounded",
+          isFullWidth ? "w-full" : "w-full md:w-2/3"
+        )}
+      >
         <table className='w-full'>
           <TableHeader />
           <tbody>
