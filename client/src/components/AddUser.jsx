@@ -7,7 +7,10 @@ import Textbox from "./Textbox";
 import Loading from "./Loader";
 import Button from "./Button";
 import { useUpdateProfileMutation } from "../redux/slices/authApiSlice";
-import { useCreateUserMutation, useUpdateUserMutation } from "../redux/slices/userApiSlice";
+import {
+  useCreateUserMutation,
+  useUpdateUserMutation,
+} from "../redux/slices/userApiSlice";
 import { setCredentials } from "../redux/slices/authSlice";
 import { toast } from "sonner";
 
@@ -16,7 +19,8 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const [updateProfile, { isLoading: isUpdatingProfile }] = useUpdateProfileMutation();
+  const [updateProfile, { isLoading: isUpdatingProfile }] =
+    useUpdateProfileMutation();
   const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
 
@@ -44,13 +48,17 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
           name: data.name,
           title: data.title,
         }).unwrap();
-        
+
+        const updatedUser = res?.data || res;
+
         // Sync Redux auth state (update profile info, keep token)
-        dispatch(setCredentials({
-          user: res.data,
-          token: user.token
-        }));
-        
+        dispatch(
+          setCredentials({
+            user: updatedUser,
+            token: user.token,
+          }),
+        );
+
         toast.success("Profile updated successfully!");
       } else if (userData) {
         // Admin Update User
@@ -82,42 +90,46 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
   return (
     <>
       <ModalWrapper open={open} setOpen={setOpen}>
-        <form onSubmit={handleSubmit(handleOnSubmit)} className=''>
+        <form onSubmit={handleSubmit(handleOnSubmit)} className="">
           <Dialog.Title
-            as='h2'
-            className='text-base font-bold leading-6 text-gray-900 mb-4'
+            as="h2"
+            className="text-base font-bold leading-6 text-gray-900 mb-4"
           >
-            {isProfile ? "UPDATE PROFILE" : userData ? "UPDATE USER DETAILS" : "ADD NEW USER"}
+            {isProfile
+              ? "UPDATE PROFILE"
+              : userData
+                ? "UPDATE USER DETAILS"
+                : "ADD NEW USER"}
           </Dialog.Title>
-          <div className='mt-2 flex flex-col gap-6'>
+          <div className="mt-2 flex flex-col gap-6">
             <Textbox
-              placeholder='Full name'
-              type='text'
-              name='name'
-              label='Full Name'
-              className='w-full rounded'
+              placeholder="Full name"
+              type="text"
+              name="name"
+              label="Full Name"
+              className="w-full rounded"
               register={register("name", {
                 required: "Full name is required!",
               })}
               error={errors.name ? errors.name.message : ""}
             />
             <Textbox
-              placeholder='Title'
-              type='text'
-              name='title'
-              label='Title'
-              className='w-full rounded'
+              placeholder="Title"
+              type="text"
+              name="title"
+              label="Title"
+              className="w-full rounded"
               register={register("title", {
                 required: "Title is required!",
               })}
               error={errors.title ? errors.title.message : ""}
             />
             <Textbox
-              placeholder='Email Address'
-              type='email'
-              name='email'
-              label='Email Address'
-              className='w-full rounded disabled:opacity-60'
+              placeholder="Email Address"
+              type="email"
+              name="email"
+              label="Email Address"
+              className="w-full rounded disabled:opacity-60"
               register={register("email", {
                 required: "Email Address is required!",
               })}
@@ -126,11 +138,11 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
             />
 
             <Textbox
-              placeholder='Role'
-              type='text'
-              name='role'
-              label='Role'
-              className='w-full rounded disabled:opacity-60'
+              placeholder="Role"
+              type="text"
+              name="role"
+              label="Role"
+              className="w-full rounded disabled:opacity-60"
               register={register("role", {
                 required: "User role is required!",
               })}
@@ -140,21 +152,21 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
           </div>
 
           {isLoading ? (
-            <div className='py-5 flex justify-center'>
+            <div className="py-5 flex justify-center">
               <Loading />
             </div>
           ) : (
-            <div className='py-3 mt-6 flex justify-end gap-3'>
+            <div className="py-3 mt-6 flex justify-end gap-3">
               <Button
-                type='button'
-                className='bg-gray-100 px-5 text-sm font-semibold text-gray-700 hover:bg-gray-200 rounded-full'
+                type="button"
+                className="bg-gray-100 px-5 text-sm font-semibold text-gray-700 hover:bg-gray-200 rounded-full"
                 onClick={() => setOpen(false)}
-                label='Cancel'
+                label="Cancel"
               />
               <Button
-                type='submit'
-                className='bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-700 rounded-full'
-                label='Submit'
+                type="submit"
+                className="bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-700 rounded-full"
+                label="Submit"
               />
             </div>
           )}

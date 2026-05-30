@@ -4,7 +4,7 @@ import { user } from "../../assets/data";
 const initialState = {
   user: localStorage.getItem("userInfo")
     ? JSON.parse(localStorage.getItem("userInfo"))
-    : user,
+    : null,
 
   isSidebarOpen: false,
 };
@@ -18,11 +18,11 @@ const authSlice = createSlice({
       // If we got a direct API response (with data.user and data.token)
       const rawUser = userPayload?.user ? userPayload.user : userPayload;
       const token = userPayload?.token ? userPayload.token : null;
-      
+
       const userWithAdminFlag = {
         ...rawUser,
         isAdmin: rawUser?.role === "ADMIN" || rawUser?.isAdmin || false,
-        token: token || rawUser?.token
+        token: token || rawUser?.token,
       };
 
       state.user = userWithAdminFlag;

@@ -19,10 +19,10 @@ const TaskTable = ({ tasks }) => {
   const TableHeader = () => (
     <thead className='border-b border-gray-300 '>
       <tr className='text-black text-left'>
-        <th className='py-2'>Task Title</th>
-        <th className='py-2'>Priority</th>
-        <th className='py-2'>Team</th>
-        <th className='py-2 hidden md:block'>Created At</th>
+        <th className='py-2'>ชื่องาน</th>
+        <th className='py-2'>ความสำคัญ</th>
+        <th className='py-2'>ทีม</th>
+        <th className='py-2 hidden md:block'>สร้างเมื่อ</th>
       </tr>
     </thead>
   );

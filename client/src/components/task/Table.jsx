@@ -34,11 +34,11 @@ const Table = ({ tasks }) => {
   const TableHeader = () => (
     <thead className='w-full border-b border-gray-300'>
       <tr className='w-full text-black  text-left'>
-        <th className='py-2'>Task Title</th>
-        <th className='py-2'>Priority</th>
-        <th className='py-2 line-clamp-1'>Created At</th>
-        <th className='py-2'>Assets</th>
-        <th className='py-2'>Team</th>
+        <th className='py-2'>ชื่องาน</th>
+        <th className='py-2'>ความสำคัญ</th>
+        <th className='py-2 line-clamp-1'>สร้างเมื่อ</th>
+        <th className='py-2'>ไฟล์แนบ</th>
+        <th className='py-2'>ทีม</th>
       </tr>
     </thead>
   );
@@ -62,7 +62,7 @@ const Table = ({ tasks }) => {
             {ICONS[task?.priority]}
           </span>
           <span className='capitalize line-clamp-1'>
-            {task?.priority} Priority
+            ความสำคัญ {task?.priority}
           </span>
         </div>
       </td>
@@ -109,13 +109,13 @@ const Table = ({ tasks }) => {
       <td className='py-2 flex gap-2 md:gap-4 justify-end'>
         <Button
           className='text-blue-600 hover:text-blue-500 sm:px-0 text-sm md:text-base'
-          label='Edit'
+          label='แก้ไข'
           type='button'
         />
 
         <Button
           className='text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base'
-          label='Delete'
+          label='ลบ'
           type='button'
           onClick={() => deleteClicks(task._id)}
         />

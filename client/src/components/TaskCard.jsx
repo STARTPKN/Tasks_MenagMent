@@ -36,7 +36,7 @@ const TaskCard = ({ task }) => {
             )}
           >
             <span className='text-lg'>{ICONS[task?.priority]}</span>
-            <span className='uppercase'>{task?.priority} Priority</span>
+            <span className='uppercase'>ความสำคัญ {task?.priority}</span>
           </div>
 
           {user?.isAdmin && <TaskDialog task={task} />}
@@ -105,7 +105,7 @@ const TaskCard = ({ task }) => {
         ) : (
           <>
             <div className='py-4 border-t border-gray-200'>
-              <span className='text-gray-500'>No Sub Task</span>
+              <span className='text-gray-500'>ไม่มีงานย่อย</span>
             </div>
           </>
         )}
@@ -117,7 +117,7 @@ const TaskCard = ({ task }) => {
             className='w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled::text-gray-300'
           >
             <IoMdAdd className='text-lg' />
-            <span>ADD SUBTASK</span>
+            <span>เพิ่มงานย่อย</span>
           </button>
         </div>
       </div>

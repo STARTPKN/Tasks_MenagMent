@@ -28,19 +28,19 @@ const Users = () => {
   const deleteHandler = async () => {
     try {
       await deleteUser(selected).unwrap();
-      toast.success("User deleted successfully!");
+      toast.success("ลบผู้ใช้สำเร็จ!");
       setOpenDialog(false);
     } catch (err) {
-      toast.error(err?.data?.message || err?.error || "Failed to delete user");
+      toast.error(err?.data?.message || err?.error || "ลบผู้ใช้ไม่สำเร็จ");
     }
   };
 
   const userStatusClick = async (user) => {
     try {
       await toggleUserStatus(user.id).unwrap();
-      toast.success(`User ${user.isActive ? "disabled" : "activated"} successfully!`);
+      toast.success(`อัปเดตสถานะผู้ใช้สำเร็จ!`);
     } catch (err) {
-      toast.error(err?.data?.message || err?.error || "Failed to update status");
+      toast.error(err?.data?.message || err?.error || "อัปเดตสถานะไม่สำเร็จ");
     }
   };
 
@@ -57,12 +57,12 @@ const Users = () => {
   const TableHeader = () => (
     <thead className='border-b border-gray-300'>
       <tr className='text-black text-left'>
-        <th className='py-2'>Full Name</th>
-        <th className='py-2'>Title</th>
-        <th className='py-2'>Email</th>
-        <th className='py-2'>Role</th>
-        <th className='py-2'>Active</th>
-        <th className='py-2 text-right'>Actions</th>
+        <th className='py-2'>ชื่อ-นามสกุล</th>
+        <th className='py-2'>ตำแหน่ง</th>
+        <th className='py-2'>อีเมล</th>
+        <th className='py-2'>บทบาท</th>
+        <th className='py-2'>สถานะ</th>
+        <th className='py-2 text-right'>การจัดการ</th>
       </tr>
     </thead>
   );
@@ -92,21 +92,21 @@ const Users = () => {
             user?.isActive ? "bg-blue-100 text-blue-700" : "bg-yellow-100 text-yellow-700"
           )}
         >
-          {user?.isActive ? "Active" : "Disabled"}
+          {user?.isActive ? "ใช้งานปกติ" : "ระงับใช้งาน"}
         </button>
       </td>
 
       <td className='p-2 flex gap-4 justify-end'>
         <Button
           className='text-blue-600 hover:text-blue-500 font-semibold sm:px-0'
-          label='Edit'
+          label='แก้ไข'
           type='button'
           onClick={() => editClick(user)}
         />
 
         <Button
           className='text-red-700 hover:text-red-500 font-semibold sm:px-0'
-          label='Delete'
+          label='ลบ'
           type='button'
           onClick={() => deleteClick(user.id)}
         />
@@ -118,9 +118,9 @@ const Users = () => {
     <>
       <div className='w-full md:px-1 px-0 mb-6'>
         <div className='flex items-center justify-between mb-8'>
-          <Title title='Team Members' />
+          <Title title='สมาชิกทีม' />
           <Button
-            label='Add New User'
+            label='เพิ่มผู้ใช้'
             icon={<IoMdAdd className='text-lg' />}
             className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md 2xl:py-2.5 px-4 font-semibold text-sm hover:bg-blue-700 transition-colors'
             onClick={() => {
