@@ -6,6 +6,7 @@ import { getInitials } from "../utils";
 import clsx from "clsx";
 import ConfirmatioDialog from "../components/Dialogs";
 import AddUser from "../components/AddUser";
+import ChangePasswordDialog from "../components/ChangePasswordDialog";
 import Loader from "../components/Loader";
 import {
   useGetUsersQuery,
@@ -21,6 +22,7 @@ const Users = () => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [open, setOpen] = useState(false);
+  const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
   const [selected, setSelected] = useState(null);
 
   const usersList = data?.data || [];
@@ -54,25 +56,30 @@ const Users = () => {
     setOpen(true);
   };
 
+  const changePasswordClick = (user) => {
+    setSelected(user);
+    setOpenPasswordDialog(true);
+  };
+
   const TableHeader = () => (
-    <thead className='border-b border-gray-300'>
-      <tr className='text-black text-left'>
-        <th className='py-2'>ชื่อ-นามสกุล</th>
-        <th className='py-2'>ตำแหน่ง</th>
-        <th className='py-2'>อีเมล</th>
-        <th className='py-2'>บทบาท</th>
-        <th className='py-2'>สถานะ</th>
-        <th className='py-2 text-right'>การจัดการ</th>
+    <thead className="border-b border-gray-300">
+      <tr className="text-black text-left">
+        <th className="py-2">ชื่อ-นามสกุล</th>
+        <th className="py-2">ตำแหน่ง</th>
+        <th className="py-2">อีเมล</th>
+        <th className="py-2">บทบาท</th>
+        <th className="py-2">สถานะ</th>
+        <th className="py-2 text-right">การจัดการ</th>
       </tr>
     </thead>
   );
 
   const TableRow = ({ user }) => (
-    <tr className='border-b border-gray-200 text-gray-600 hover:bg-gray-400/10'>
-      <td className='p-2'>
-        <div className='flex items-center gap-3'>
-          <div className='w-9 h-9 rounded-full text-white flex items-center justify-center text-sm bg-blue-700 font-semibold'>
-            <span className='text-xs md:text-sm text-center'>
+    <tr className="border-b border-gray-200 text-gray-600 hover:bg-gray-400/10">
+      <td className="p-2">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full text-white flex items-center justify-center text-sm bg-blue-700 font-semibold">
+            <span className="text-xs md:text-sm text-center">
               {getInitials(user.name)}
             </span>
           </div>
@@ -80,34 +87,43 @@ const Users = () => {
         </div>
       </td>
 
-      <td className='p-2'>{user.title}</td>
-      <td className='p-2'>{user.email}</td>
-      <td className='p-2'>{user.role}</td>
+      <td className="p-2">{user.title}</td>
+      <td className="p-2">{user.email}</td>
+      <td className="p-2">{user.role}</td>
 
-      <td className='p-2'>
+      <td className="p-2">
         <button
           onClick={() => userStatusClick(user)}
           className={clsx(
             "w-fit px-4 py-1 rounded-full text-xs font-semibold hover:opacity-85 transition-opacity",
-            user?.isActive ? "bg-blue-100 text-blue-700" : "bg-yellow-100 text-yellow-700"
+            user?.isActive
+              ? "bg-blue-100 text-blue-700"
+              : "bg-yellow-100 text-yellow-700",
           )}
         >
           {user?.isActive ? "ใช้งานปกติ" : "ระงับใช้งาน"}
         </button>
       </td>
 
-      <td className='p-2 flex gap-4 justify-end'>
+      <td className="p-2 flex gap-4 justify-end">
         <Button
-          className='text-blue-600 hover:text-blue-500 font-semibold sm:px-0'
-          label='แก้ไข'
-          type='button'
+          className="text-blue-600 hover:text-blue-500 font-semibold sm:px-0"
+          label="แก้ไข"
+          type="button"
           onClick={() => editClick(user)}
         />
 
         <Button
-          className='text-red-700 hover:text-red-500 font-semibold sm:px-0'
-          label='ลบ'
-          type='button'
+          className="text-yellow-600 hover:text-yellow-500 font-semibold sm:px-0"
+          label="เปลี่ยนรหัส"
+          type="button"
+          onClick={() => changePasswordClick(user)}
+        />
+
+        <Button
+          className="text-red-700 hover:text-red-500 font-semibold sm:px-0"
+          label="ลบ"
+          type="button"
           onClick={() => deleteClick(user.id)}
         />
       </td>
@@ -116,13 +132,13 @@ const Users = () => {
 
   return (
     <>
-      <div className='w-full md:px-1 px-0 mb-6'>
-        <div className='flex items-center justify-between mb-8'>
-          <Title title='สมาชิกทีม' />
+      <div className="w-full md:px-1 px-0 mb-6">
+        <div className="flex items-center justify-between mb-8">
+          <Title title="สมาชิกทีม" />
           <Button
-            label='เพิ่มผู้ใช้'
-            icon={<IoMdAdd className='text-lg' />}
-            className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md 2xl:py-2.5 px-4 font-semibold text-sm hover:bg-blue-700 transition-colors'
+            label="เพิ่มผู้ใช้"
+            icon={<IoMdAdd className="text-lg" />}
+            className="flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md 2xl:py-2.5 px-4 font-semibold text-sm hover:bg-blue-700 transition-colors"
             onClick={() => {
               setSelected(null);
               setOpen(true);
@@ -131,17 +147,17 @@ const Users = () => {
         </div>
 
         {isLoading ? (
-          <div className='w-full py-20 flex items-center justify-center'>
+          <div className="w-full py-20 flex items-center justify-center">
             <Loader />
           </div>
         ) : error ? (
-          <div className='w-full py-10 text-center text-red-500 font-semibold'>
+          <div className="w-full py-10 text-center text-red-500 font-semibold">
             Failed to load users: {error?.data?.message || "Connection error"}
           </div>
         ) : (
-          <div className='bg-white px-2 md:px-4 py-4 shadow-md rounded'>
-            <div className='overflow-x-auto'>
-              <table className='w-full mb-5'>
+          <div className="bg-white px-2 md:px-4 py-4 shadow-md rounded">
+            <div className="overflow-x-auto">
+              <table className="w-full mb-5">
                 <TableHeader />
                 <tbody>
                   {usersList.map((user) => (
@@ -159,6 +175,12 @@ const Users = () => {
         setOpen={setOpen}
         userData={selected}
         key={selected ? `edit-${selected.id}` : "add-user"}
+      />
+
+      <ChangePasswordDialog
+        open={openPasswordDialog}
+        setOpen={setOpenPasswordDialog}
+        user={selected}
       />
 
       <ConfirmatioDialog

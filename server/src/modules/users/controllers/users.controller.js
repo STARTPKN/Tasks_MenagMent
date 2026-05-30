@@ -55,6 +55,18 @@ export const usersController = {
       next(error);
     }
   },
+
+  changeUserPassword: async (req, res, next) => {
+    try {
+      const user = await usersService.changeUserPassword(
+        req.params.id,
+        req.body.password,
+      );
+      apiSuccess(res, "User password changed successfully", user);
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 export default usersController;

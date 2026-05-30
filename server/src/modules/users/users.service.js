@@ -62,6 +62,18 @@ export const usersService = {
     }
     return usersRepository.toggleStatus(id, !user.isActive);
   },
+
+  changeUserPassword: async (id, newPassword) => {
+    const user = await usersRepository.findById(id);
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    return usersRepository.update(id, { password: hashedPassword });
+  },
 };
 
 export default usersService;
