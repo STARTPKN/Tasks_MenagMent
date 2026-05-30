@@ -38,7 +38,7 @@ const TaskDialog = ({ task }) => {
       onClick: () => setOpen(true),
     },
     {
-      label: "Duplicate",
+      label: "คัดลอก",
       icon: <HiDuplicate className="mr-2 h-5 w-5" aria-hidden="true" />,
       onClick: () => duplicateHandler(),
     },

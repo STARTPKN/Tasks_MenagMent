@@ -8,8 +8,25 @@ import SelectList from "../SelectList";
 import { BiImages } from "react-icons/bi";
 import Button from "../Button";
 
-const LISTS = ["TODO", "IN PROGRESS", "COMPLETED"];
-const PRIORIRY = ["HIGH", "MEDIUM", "NORMAL", "LOW"];
+const LISTS = ["ที่ต้องทำ", "กำลังดำเนินการ", "เสร็จสิ้น"];
+const PRIORIRY = ["สูง", "ปานกลาง", "ปกติ", "ต่ำ"];
+
+const mapStageToThai = (stage) => {
+  const s = stage?.toLowerCase();
+  if (s === "todo") return LISTS[0];
+  if (s === "in progress") return LISTS[1];
+  if (s === "completed") return LISTS[2];
+  return LISTS[0];
+};
+
+const mapPriorityToThai = (priority) => {
+  const p = priority?.toLowerCase();
+  if (p === "high") return PRIORIRY[0];
+  if (p === "medium") return PRIORIRY[1];
+  if (p === "normal") return PRIORIRY[2];
+  if (p === "low") return PRIORIRY[3];
+  return PRIORIRY[2];
+};
 
 const uploadedFileURLs = [];
 
@@ -26,10 +43,8 @@ const AddTask = ({ open, setOpen, task = null }) => {
     },
   });
   const [team, setTeam] = useState(task?.team || []);
-  const [stage, setStage] = useState(task?.stage?.toUpperCase() || LISTS[0]);
-  const [priority, setPriority] = useState(
-    task?.priority?.toUpperCase() || PRIORIRY[2],
-  );
+  const [stage, setStage] = useState(mapStageToThai(task?.stage));
+  const [priority, setPriority] = useState(mapPriorityToThai(task?.priority));
   const [assets, setAssets] = useState([]);
   const [uploading, setUploading] = useState(false);
 
@@ -42,8 +57,8 @@ const AddTask = ({ open, setOpen, task = null }) => {
       date: task?.date ? task.date.split("T")[0] : "",
     });
     setTeam(task?.team || []);
-    setStage(task?.stage?.toUpperCase() || LISTS[0]);
-    setPriority(task?.priority?.toUpperCase() || PRIORIRY[2]);
+    setStage(mapStageToThai(task?.stage));
+    setPriority(mapPriorityToThai(task?.priority));
   }, [task, open, reset]);
 
   const handleSelect = (e) => {
@@ -58,17 +73,17 @@ const AddTask = ({ open, setOpen, task = null }) => {
             as="h2"
             className="text-base font-bold leading-6 text-gray-900 mb-4"
           >
-            {task ? "UPDATE TASK" : "ADD TASK"}
+            {task ? "แก้ไขงาน" : "สร้างงาน"}
           </Dialog.Title>
 
           <div className="mt-2 flex flex-col gap-6">
             <Textbox
-              placeholder="Task Title"
+              placeholder="ชื่องาน"
               type="text"
               name="title"
-              label="Task Title"
+              label="ชื่องาน"
               className="w-full rounded"
-              register={register("title", { required: "Title is required" })}
+              register={register("title", { required: "กรุณาระบุชื่องาน" })}
               error={errors.title ? errors.title.message : ""}
             />
 
@@ -76,7 +91,7 @@ const AddTask = ({ open, setOpen, task = null }) => {
 
             <div className="flex gap-4">
               <SelectList
-                label="Task Stage"
+                label="สถานะงาน"
                 lists={LISTS}
                 selected={stage}
                 setSelected={setStage}
@@ -84,13 +99,13 @@ const AddTask = ({ open, setOpen, task = null }) => {
 
               <div className="w-full">
                 <Textbox
-                  placeholder="Date"
+                  placeholder="วันที่"
                   type="date"
                   name="date"
-                  label="Task Date"
+                  label="วันที่"
                   className="w-full rounded"
                   register={register("date", {
-                    required: "Date is required!",
+                    required: "กรุณาระบุวันที่!",
                   })}
                   error={errors.date ? errors.date.message : ""}
                 />
@@ -99,7 +114,7 @@ const AddTask = ({ open, setOpen, task = null }) => {
 
             <div className="flex gap-4">
               <SelectList
-                label="Priority Level"
+                label="ระดับความสำคัญ"
                 lists={PRIORIRY}
                 selected={priority}
                 setSelected={setPriority}
@@ -119,7 +134,7 @@ const AddTask = ({ open, setOpen, task = null }) => {
                     multiple={true}
                   />
                   <BiImages />
-                  <span>Add Assets</span>
+                  <span>เพิ่มไฟล์แนบ</span>
                 </label>
               </div>
             </div>
@@ -127,11 +142,11 @@ const AddTask = ({ open, setOpen, task = null }) => {
             <div className="bg-gray-50 py-6 sm:flex sm:flex-row-reverse gap-4">
               {uploading ? (
                 <span className="text-sm py-2 text-red-500">
-                  Uploading assets
+                  กำลังอัปโหลด...
                 </span>
               ) : (
                 <Button
-                  label="Submit"
+                  label="บันทึก"
                   type="submit"
                   className="bg-blue-600 px-8 text-sm font-semibold text-white hover:bg-blue-700  sm:w-auto"
                 />
@@ -141,7 +156,7 @@ const AddTask = ({ open, setOpen, task = null }) => {
                 type="button"
                 className="bg-white px-5 text-sm font-semibold text-gray-900 sm:w-auto"
                 onClick={() => setOpen(false)}
-                label="Cancel"
+                label="ยกเลิก"
               />
             </div>
           </div>

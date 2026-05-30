@@ -96,55 +96,55 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
             className="text-base font-bold leading-6 text-gray-900 mb-4"
           >
             {isProfile
-              ? "UPDATE PROFILE"
+              ? "แก้ไขโปรไฟล์"
               : userData
-                ? "UPDATE USER DETAILS"
-                : "ADD NEW USER"}
+                ? "แก้ไขข้อมูลผู้ใช้"
+                : "เพิ่มผู้ใช้ใหม่"}
           </Dialog.Title>
           <div className="mt-2 flex flex-col gap-6">
             <Textbox
-              placeholder="Full name"
+              placeholder="ชื่อ-นามสกุล"
               type="text"
               name="name"
-              label="Full Name"
+              label="ชื่อ-นามสกุล"
               className="w-full rounded"
               register={register("name", {
-                required: "Full name is required!",
+                required: "กรุณาระบุชื่อ-นามสกุล!",
               })}
               error={errors.name ? errors.name.message : ""}
             />
             <Textbox
-              placeholder="Title"
+              placeholder="ตำแหน่ง"
               type="text"
               name="title"
-              label="Title"
+              label="ตำแหน่ง"
               className="w-full rounded"
               register={register("title", {
-                required: "Title is required!",
+                required: "กรุณาระบุตำแหน่ง!",
               })}
               error={errors.title ? errors.title.message : ""}
             />
             <Textbox
-              placeholder="Email Address"
+              placeholder="อีเมล"
               type="email"
               name="email"
-              label="Email Address"
+              label="อีเมล"
               className="w-full rounded disabled:opacity-60"
               register={register("email", {
-                required: "Email Address is required!",
+                required: "กรุณาระบุอีเมล!",
               })}
               error={errors.email ? errors.email.message : ""}
               disabled={isProfile}
             />
 
             <Textbox
-              placeholder="Role"
+              placeholder="บทบาท"
               type="text"
               name="role"
-              label="Role"
+              label="บทบาท"
               className="w-full rounded disabled:opacity-60"
               register={register("role", {
-                required: "User role is required!",
+                required: "กรุณาระบุบทบาท!",
               })}
               error={errors.role ? errors.role.message : ""}
               disabled={isProfile}
@@ -161,12 +161,12 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
                 type="button"
                 className="bg-gray-100 px-5 text-sm font-semibold text-gray-700 hover:bg-gray-200 rounded-full"
                 onClick={() => setOpen(false)}
-                label="Cancel"
+                label="ยกเลิก"
               />
               <Button
                 type="submit"
                 className="bg-blue-600 px-5 text-sm font-semibold text-white hover:bg-blue-700 rounded-full"
-                label="Submit"
+                label="บันทึก"
               />
             </div>
           )}

@@ -47,3 +47,21 @@ export const BGS = [
   "bg-red-600",
   "bg-green-600",
 ];
+
+export const PRIORITY_THAI = {
+  high: "สูง",
+  medium: "ปานกลาง",
+  low: "ต่ำ",
+  normal: "ปกติ",
+};
+
+export const TASK_TYPE_THAI = {
+  todo: "ที่ต้องทำ",
+  "in progress": "กำลังดำเนินการ",
+  completed: "เสร็จสิ้น",
+};
+
+export const ROLE_THAI = {
+  Admin: "ผู้ดูแลระบบ",
+  User: "ผู้ใช้งาน",
+};

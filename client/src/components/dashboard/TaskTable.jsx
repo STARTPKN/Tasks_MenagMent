@@ -6,7 +6,7 @@ import {
 } from "react-icons/md";
 import clsx from "clsx";
 import moment from "moment";
-import { BGS, PRIOTITYSTYELS, TASK_TYPE } from "../../utils";
+import { BGS, PRIOTITYSTYELS, TASK_TYPE, PRIORITY_THAI } from "../../utils";
 import UserInfo from "../UserInfo";
 
 const TaskTable = ({ tasks }) => {
@@ -44,7 +44,7 @@ const TaskTable = ({ tasks }) => {
           <span className={clsx("text-lg", PRIOTITYSTYELS[task.priority])}>
             {ICONS[task.priority]}
           </span>
-          <span className='capitalize'>{task.priority}</span>
+          <span className='capitalize'>{PRIORITY_THAI[task.priority] || task.priority}</span>
         </div>
       </td>
 

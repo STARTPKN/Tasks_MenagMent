@@ -12,6 +12,7 @@ import BoardView from "../components/BoardView";
 import { tasks } from "../assets/data";
 import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
+import { TASK_TYPE_THAI } from "../utils";
 
 const TABS = [
   { title: "มุมมองกระดาน", icon: <MdGridView /> },
@@ -44,7 +45,7 @@ const Tasks = () => {
   ) : (
     <div className='w-full'>
       <div className='flex items-center justify-between mb-4'>
-        <Title title={status ? `งานสถานะ: ${status}` : "งานทั้งหมด"} />
+        <Title title={status ? `งานสถานะ: ${TASK_TYPE_THAI[status] || status}` : "งานทั้งหมด"} />
 
         {!status && (
           <Button

@@ -1,7 +1,7 @@
 import React from "react";
 import clsx from "clsx";
 import moment from "moment";
-import { getInitials } from "../../utils";
+import { getInitials, ROLE_THAI } from "../../utils";
 import { RiUserFollowFill, RiUserForbidFill } from "react-icons/ri";
 
 const UserTable = ({ users }) => {
@@ -28,7 +28,7 @@ const UserTable = ({ users }) => {
 
             <div>
               <p> {user.name}</p>
-              <span className="text-xs text-black">{user?.role}</span>
+              <span className="text-xs text-black">{ROLE_THAI[user?.role] || user?.role}</span>
             </div>
           </div>
         </td>

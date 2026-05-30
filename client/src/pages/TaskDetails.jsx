@@ -11,7 +11,7 @@ import { RxActivityLog } from "react-icons/rx";
 import { useParams } from "react-router-dom";
 import { tasks } from "../assets/data";
 import Tabs from "../components/Tabs";
-import { PRIOTITYSTYELS, TASK_TYPE, getInitials } from "../utils";
+import { PRIOTITYSTYELS, TASK_TYPE, getInitials, PRIORITY_THAI, TASK_TYPE_THAI } from "../utils";
 import Activities from "../components/task/Activities";
 
 const assets = [
@@ -34,8 +34,8 @@ const bgColor = {
 };
 
 const TABS = [
-  { title: "Task Detail", icon: <FaTasks /> },
-  { title: "Activities/Timeline", icon: <RxActivityLog /> },
+  { title: "รายละเอียดงาน", icon: <FaTasks /> },
+  { title: "กิจกรรม/ไทม์ไลน์", icon: <RxActivityLog /> },
 ];
 
 const TaskDetails = () => {
@@ -63,7 +63,7 @@ const TaskDetails = () => {
                     )}
                   >
                     <span className='text-lg'>{ICONS[task?.priority]}</span>
-                    <span className='uppercase'>{task?.priority} Priority</span>
+                    <span className='uppercase'>ความสำคัญ {PRIORITY_THAI[task?.priority] || task?.priority}</span>
                   </div>
 
                   <div className={clsx("flex items-center gap-2")}>
@@ -73,31 +73,31 @@ const TaskDetails = () => {
                         TASK_TYPE[task.stage]
                       )}
                     />
-                    <span className='text-black uppercase'>{task?.stage}</span>
+                    <span className='text-black uppercase'>{TASK_TYPE_THAI[task?.stage] || task?.stage}</span>
                   </div>
                 </div>
 
                 <p className='text-gray-500'>
-                  Created At: {new Date(task?.date).toDateString()}
+                  สร้างเมื่อ: {new Date(task?.date).toDateString()}
                 </p>
 
                 <div className='flex items-center gap-8 p-4 border-y border-gray-200'>
                   <div className='space-x-2'>
-                    <span className='font-semibold'>Assets :</span>
+                    <span className='font-semibold'>ไฟล์แนบ :</span>
                     <span>{task?.assets?.length}</span>
                   </div>
 
                   <span className='text-gray-400'>|</span>
 
                   <div className='space-x-2'>
-                    <span className='font-semibold'>Sub-Task :</span>
+                    <span className='font-semibold'>งานย่อย :</span>
                     <span>{task?.subTasks?.length}</span>
                   </div>
                 </div>
 
                 <div className='space-y-4 py-6'>
                   <p className='text-gray-600 font-semibold test-sm'>
-                    TASK TEAM
+                    ทีมงาน
                   </p>
                   <div className='space-y-3'>
                     {task?.team?.map((m, index) => (
@@ -126,7 +126,7 @@ const TaskDetails = () => {
 
                 <div className='space-y-4 py-6'>
                   <p className='text-gray-500 font-semibold text-sm'>
-                    SUB-TASKS
+                    งานย่อย
                   </p>
                   <div className='space-y-8'>
                     {task?.subTasks?.map((el, index) => (
@@ -155,7 +155,7 @@ const TaskDetails = () => {
               </div>
               {/* RIGHT */}
               <div className='w-full md:w-1/2 space-y-8'>
-                <p className='text-lg font-semibold'>ASSETS</p>
+                <p className='text-lg font-semibold'>ไฟล์แนบ</p>
 
                 <div className='w-full grid grid-cols-2 gap-4'>
                   {task?.assets?.map((el, index) => (

@@ -7,7 +7,7 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { useSelector } from "react-redux";
-import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate } from "../utils";
+import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate, PRIORITY_THAI } from "../utils";
 import TaskDialog from "./task/TaskDialog";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
@@ -36,7 +36,7 @@ const TaskCard = ({ task }) => {
             )}
           >
             <span className='text-lg'>{ICONS[task?.priority]}</span>
-            <span className='uppercase'>ความสำคัญ {task?.priority}</span>
+            <span className='uppercase'>ความสำคัญ {PRIORITY_THAI[task?.priority] || task?.priority}</span>
           </div>
 
           {user?.isAdmin && <TaskDialog task={task} />}

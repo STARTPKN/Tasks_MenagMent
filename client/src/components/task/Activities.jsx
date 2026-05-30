@@ -40,13 +40,22 @@ const TASKTYPEICON = {
 };
 
 const act_types = [
-  "Started",
-  "Completed",
-  "In Progress",
-  "Commented",
-  "Bug",
-  "Assigned",
+  "เริ่มแล้ว",
+  "เสร็จสิ้น",
+  "กำลังดำเนินการ",
+  "แสดงความคิดเห็น",
+  "พบบั๊ก",
+  "มอบหมาย",
 ];
+
+const ACT_TYPES_THAI = {
+  started: "เริ่มแล้ว",
+  completed: "เสร็จสิ้น",
+  "in progress": "กำลังดำเนินการ",
+  commented: "แสดงความคิดเห็น",
+  bug: "พบบั๊ก",
+  assigned: "มอบหมาย",
+};
 
 const Activities = ({ activity, id }) => {
   const [selected, setSelected] = useState(act_types[0]);
@@ -70,7 +79,7 @@ const Activities = ({ activity, id }) => {
         <div className='flex flex-col gap-y-1 mb-8'>
           <p className='font-semibold'>{item?.by?.name}</p>
           <div className='text-gray-500 space-y-2'>
-            <span className='capitalize'>{item?.type}</span>
+            <span className='capitalize'>{ACT_TYPES_THAI[item?.type] || item?.type}</span>
             <span className='text-sm'>{moment(item?.date).fromNow()}</span>
           </div>
           <div className='text-gray-700'>{item?.activity}</div>
@@ -82,7 +91,7 @@ const Activities = ({ activity, id }) => {
   return (
     <div className='w-full flex gap-10 2xl:gap-20 min-h-screen px-10 py-8 bg-white shadow rounded-md justify-between overflow-y-auto'>
       <div className='w-full md:w-1/2'>
-        <h4 className='text-gray-600 font-semibold text-lg mb-5'>Activities</h4>
+        <h4 className='text-gray-600 font-semibold text-lg mb-5'>กิจกรรม</h4>
 
         <div className='w-full'>
           {activity?.map((el, index) => (
@@ -97,7 +106,7 @@ const Activities = ({ activity, id }) => {
 
       <div className='w-full md:w-1/3'>
         <h4 className='text-gray-600 font-semibold text-lg mb-5'>
-          Add Activity
+          เพิ่มกิจกรรม
         </h4>
         <div className='w-full flex flex-wrap gap-5'>
           {act_types.map((item, index) => (
@@ -115,7 +124,7 @@ const Activities = ({ activity, id }) => {
             rows={10}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder='Type ......'
+            placeholder='พิมพ์ข้อความ...'
             className='bg-white w-full mt-10 border border-gray-300 outline-none p-4 rounded-md focus:ring-2 ring-blue-500'
           ></textarea>
           {isLoading ? (
@@ -123,7 +132,7 @@ const Activities = ({ activity, id }) => {
           ) : (
             <Button
               type='button'
-              label='Submit'
+              label='ยืนยัน'
               onClick={handleSubmit}
               className='bg-blue-600 text-white rounded'
             />
