@@ -34,41 +34,41 @@ const AddSubTask = ({ open, setOpen, id }) => {
             as='h2'
             className='text-base font-bold leading-6 text-gray-900 mb-4'
           >
-            ADD SUB-TASK
+            เพิ่มงานย่อย
           </Dialog.Title>
           <div className='mt-2 flex flex-col gap-6'>
             <Textbox
-              placeholder='Sub-Task title'
+              placeholder='ชื่อหัวข้อย่อย'
               type='text'
               name='title'
-              label='Title'
+              label='ชื่อหัวข้อ'
               className='w-full rounded'
               register={register("title", {
-                required: "Title is required!",
+                required: "กรุณากรอกชื่อหัวข้อ!",
               })}
               error={errors.title ? errors.title.message : ""}
             />
 
             <div className='flex items-center gap-4'>
               <Textbox
-                placeholder='Date'
+                placeholder='เวลา'
                 type='date'
                 name='date'
-                label='Task Date'
+                label='วันที่งาน'
                 className='w-full rounded'
                 register={register("date", {
-                  required: "Date is required!",
+                  required: "กรุณากรอกวันที่งาน!",
                 })}
                 error={errors.date ? errors.date.message : ""}
               />
               <Textbox
-                placeholder='Tag'
+                placeholder='แท็ก'
                 type='text'
                 name='tag'
-                label='Tag'
+                label='แท็ก'
                 className='w-full rounded'
                 register={register("tag", {
-                  required: "Tag is required!",
+                  required: "กรุณากรอกแท็ก!",
                 })}
                 error={errors.tag ? errors.tag.message : ""}
               />
@@ -78,14 +78,14 @@ const AddSubTask = ({ open, setOpen, id }) => {
             <Button
               type='submit'
               className='bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 sm:ml-3 sm:w-auto'
-              label='Add Task'
+              label='เพิ่มงาน'
             />
 
             <Button
               type='button'
               className='bg-white border text-sm font-semibold text-gray-900 sm:w-auto'
               onClick={() => setOpen(false)}
-              label='Cancel'
+              label='ยกเลิก'
             />
           </div>
         </form>
