@@ -1,0 +1,64 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         String     @id @default(uuid())
+  email      String     @unique
+  name       String
+  password   String
+  role       String     @default("USER") // ADMIN, USER
+  title      String     @default("Member")
+  isActive   Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  tasks      Task[]     @relation("TaskTeam")
+  activities Activity[]
+}
+
+model Task {
+  id         String     @id @default(uuid())
+  title      String
+  date       DateTime   @default(now())
+  priority   String     @default("NORMAL") // HIGH, MEDIUM, NORMAL, LOW
+  stage      String     @default("TODO") // TODO, IN_PROGRESS, COMPLETED
+  isTrashed  Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  team       User[]     @relation("TaskTeam")
+  subTasks   SubTask[]
+  activities Activity[]
+  assets     Asset[]
+}
+
+model SubTask {
+  id     String   @id @default(uuid())
+  title  String
+  date   DateTime @default(now())
+  tag    String
+  taskId String
+  task   Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+  id         String   @id @default(uuid())
+  type       String   @default("commented") // started, completed, in_progress, commented, bug, assigned
+  activity   String
+  date       DateTime @default(now())
+  byUserId   String
+  by         User     @relation(fields: [byUserId], references: [id], onDelete: Cascade)
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Asset {
+  id     String @id @default(uuid())
+  url    String
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
