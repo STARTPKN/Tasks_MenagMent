@@ -1,158 +1,142 @@
-# Fullstack Task Manager (MERN)
+# Fullstack Task Manager (React + Express + PostgreSQL)
+
+## ภาพรวม
+โปรเจกต์นี้เป็นเว็บแอปพลิเคชันจัดการงานสำหรับทีม ที่ออกแบบมาให้ทั้งผู้ดูแลระบบและผู้ใช้งานทั่วไปใช้งานได้สะดวก ระบบนี้ใช้ React/Vite สำหรับ frontend, Express.js สำหรับ backend และ Prisma ร่วมกับ PostgreSQL สำหรับฐานข้อมูล
+
+แอปพลิเคชันนี้รองรับ:
+- การมอบหมายงานและติดตามสถานะ
+- การจัดการผู้ใช้และบทบาท
+- การเพิ่มงานย่อยและกิจกรรมที่เกี่ยวข้อง
+- การจัดการไฟล์แนบของงาน
+- การแสดงผลแดชบอร์ดและสรุปข้อมูลงาน
+
+## ฟีเจอร์หลัก
+
+### สำหรับผู้ดูแลระบบ
+1. การจัดการผู้ใช้
+   - สร้างบัญชีผู้ดูแลระบบ
+   - เพิ่ม แก้ไข และจัดการสมาชิกทีม
+
+2. การมอบหมายงาน
+   - มอบหมายงานให้ผู้ใช้หลายคน
+   - อัปเดตรายละเอียดงานและสถานะ
+
+3. คุณสมบัติของงาน
+   - ติดป้ายสถานะงานเป็น TODO, IN_PROGRESS, COMPLETED
+   - ตั้งค่าระดับความสำคัญ HIGH, MEDIUM, NORMAL, LOW
+   - เพิ่มและจัดการงานย่อย
+
+4. การจัดการไฟล์แนบ
+   - อัปโหลดไฟล์หรือรูปภาพประกอบงาน
+
+5. การจัดการบัญชีผู้ใช้
+   - ปิดใช้งาน หรือเปิดใช้งานผู้ใช้
+   - ลบงานถาวร หรือย้ายงานไปยังถังขยะ
+
+### สำหรับผู้ใช้งานทั่วไป
+1. การโต้ตอบกับงาน
+   - เปลี่ยนสถานะงานเป็น IN_PROGRESS หรือ COMPLETED
+   - ดูรายละเอียดงานครบถ้วน
+
+2. การสื่อสาร
+   - เพิ่มคอมเมนต์หรือบันทึกกิจกรรมในงาน
+
+### ฟีเจอร์ทั่วไป
+1. การพิสูจน์ตัวตนและการอนุญาต
+   - ระบบล็อกอินด้วย JWT
+   - ควบคุมการเข้าถึงตามบทบาทผู้ใช้
+
+2. การจัดการโปรไฟล์
+   - แก้ไขข้อมูลโปรไฟล์ผู้ใช้
+
+3. การจัดการรหัสผ่าน
+   - เปลี่ยนรหัสผ่านอย่างปลอดภัย
+
+4. แดชบอร์ด
+   - แสดงสรุปสถานะงานทั้งหมด
+   - กรองงานตามสถานะ TODO, IN_PROGRESS, COMPLETED
+
+## เทคโนโลยีที่ใช้
+- Frontend:
+  - React (Vite)
+  - Redux Toolkit
+  - Headless UI
+  - Tailwind CSS
+
+- Backend:
+  - Node.js
+  - Express.js
+  - Prisma
+
+- Database:
+  - PostgreSQL
+
+## โครงสร้างโปรเจกต์สำคัญ
+- `client/` — ส่วน frontend
+- `server/` — ส่วน backend
+- `server/prisma/schema.prisma` — สคีมาฐานข้อมูล PostgreSQL
+- `server/.env` — ตัวแปรสภาพแวดล้อมของ backend
+
+## การตั้งค่าเซิร์ฟเวอร์
+
+### ตัวแปรสภาพแวดล้อม
+สร้างไฟล์ `server/.env` และใส่ค่าต่อไปนี้:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
+JWT_SECRET="your_jwt_secret"
+PORT=8800
+NODE_ENV=development
+```
+
+ตัวอย่างค่า `DATABASE_URL`:
+```env
+DATABASE_URL="postgresql://postgres:1234@localhost:5432/task_manager"
+```
+
+### ติดตั้งและเตรียมฐานข้อมูล
+1. เปิดเทอร์มินัลในโฟลเดอร์ `server`
+2. รัน `npm install`
+3. รัน `npm run prisma:generate` เพื่อสร้าง Prisma Client
+4. รัน `npm run prisma:migrate` เพื่อสร้างตารางในฐานข้อมูล
+5. รัน `npm run db:seed` (ถ้ามี) เพื่อเพิ่มข้อมูลตัวอย่าง
+
+### เริ่มเซิร์ฟเวอร์
+รันคำสั่ง:
+
+```bash
+npm start
+```
+
+หรือสำหรับโหมดพัฒนา:
+
+```bash
+npm run dev
+```
+
+เมื่อรันสำเร็จ ระบบจะแสดงข้อความว่าเซิร์ฟเวอร์กำลังทำงานและเชื่อมต่อฐานข้อมูลได้
+
+## การตั้งค่าฝั่งลูกค้า (Client)
+
+### ตัวแปรสภาพแวดล้อม
+ปัจจุบัน `client/src/redux/slices/apiSlice.js` ใช้ค่า URL ของ API เป็น `http://localhost:8800/api` โดยตรง
+
+หากต้องการเปลี่ยนพอร์ตหรือ URL ของ backend ให้แก้ไขค่าที่ `client/src/redux/slices/apiSlice.js`
+
+### ติดตั้งและรัน
+1. เปิดเทอร์มินัลในโฟลเดอร์ `client`
+2. รัน `npm install`
+3. รัน `npm run dev`
+
+เปิดเว็บเบราว์เซอร์ที่:
+
+```text
+http://localhost:5173
+```
+
+## หมายเหตุ
+- โปรเจกต์นี้ใช้ PostgreSQL ไม่ใช่ MongoDB
+- หากต้องการใช้งาน PostgreSQL ในเครื่อง ให้ติดตั้ง PostgreSQL และสร้างฐานข้อมูลตามที่กำหนดใน `DATABASE_URL`
+- ในกรณีที่ต้องการใช้ฐานข้อมูลบนคลาวด์ ให้ตั้งค่า `DATABASE_URL` เป็น URL ของ PostgreSQL ที่ใช้งานจริง
 
 
-
-# Overview
-The Cloud-Based Task Manager is a web application designed to streamline team task management. Built using the MERN stack (MongoDB, Express.js, React, and Node.js), this platform provides a user-friendly interface for efficient task assignment, tracking, and collaboration. The application caters to administrators and regular users, offering comprehensive features to enhance productivity and organization.
-
-
-
-### Why/Problem?
-In a dynamic work environment, effective task management is crucial for team success. Traditional methods of task tracking through spreadsheets or manual systems can be cumbersome and prone to errors. The Cloud-Based Task Manager aims to address these challenges by providing a centralized platform for task management, enabling seamless collaboration and improved workflow efficiency.
-
-
-
-### **Background**:
-With the rise of remote work and dispersed teams, there is a growing need for tools that facilitate effective communication and task coordination. The Cloud-Based Task Manager addresses this need by leveraging modern web technologies to create an intuitive and responsive task management solution. The MERN stack ensures scalability, while the integration of Redux Toolkit, Headless UI, and Tailwind CSS enhances user experience and performance.
-
-
-### 
-## **Admin Features:**
-1. **User Management:**
-    - Create admin accounts.
-    - Add and manage team members.
-
-2. **Task Assignment:**
-    - Assign tasks to individual or multiple users.
-    - Update task details and status.
-
-3. **Task Properties:**
-    - Label tasks as todo, in progress, or completed.
-    - Assign priority levels (high, medium, normal, low).
-    - Add and manage sub-tasks.
-
-4. **Asset Management:**
-    - Upload task assets, such as images.
-
-5. **User Account Control:**
-    - Disable or activate user accounts.
-    - Permanently delete or trash tasks.
-
-
-## **User Features:**
-1. **Task Interaction:**
-    - Change task status (in progress or completed).
-    - View detailed task information.
-
-2. **Communication:**
-    - Add comments or chat to task activities.
-
-
-## **General Features:**
-1. **Authentication and Authorization:**
-    - User login with secure authentication.
-    - Role-based access control.
-
-2. **Profile Management:**
-    - Update user profiles.
-
-3. **Password Management:**
-    - Change passwords securely.
-
-4. **Dashboard:**
-    - Provide a summary of user activities.
-    - Filter tasks into todo, in progress, or completed.
-
-
-
-
-## **Technologies Used:**
-- **Frontend:**
-    - React (Vite)
-    - Redux Toolkit for State Management
-    - Headless UI
-    - Tailwind CSS
-
-
-- **Backend:**
-    - Node.js with Express.js
-    
-- **Database:**
-    - MongoDB for efficient and scalable data storage.
-
-
-The Cloud-Based Task Manager is an innovative solution that brings efficiency and organization to task management within teams. By harnessing the power of the MERN stack and modern frontend technologies, the platform provides a seamless experience for both administrators and users, fostering collaboration and productivity.
-
-&nbsp;
-
-## SETUP INSTRUCTIONS
-
-
-# Server Setup
-
-## Environment variables
-First, create the environment variables file `.env` in the server folder. The `.env` file contains the following environment variables:
-
-- MONGODB_URI = `your MongoDB URL`
-- JWT_SECRET = `any secret key - must be secured`
-- PORT = `8800` or any port number
-- NODE_ENV = `development`
-
-
-&nbsp;
-
-## Set Up MongoDB:
-
-1. Setting up MongoDB involves a few steps:
-    - Visit MongoDB Atlas Website
-        - Go to the MongoDB Atlas website: [https://www.mongodb.com/cloud/atlas](https://www.mongodb.com/cloud/atlas).
-
-    - Create an Account
-    - Log in to your MongoDB Atlas account.
-    - Create a New Cluster
-    - Choose a Cloud Provider and Region
-    - Configure Cluster Settings
-    - Create Cluster
-    - Wait for Cluster to Deploy
-    - Create Database User
-    - Set Up IP Whitelist
-    - Connect to Cluster
-    - Configure Your Application
-    - Test the Connection
-
-2. Create a new database and configure the `.env` file with the MongoDB connection URL. 
-
-## Steps to run server
-
-1. Open the project in any editor of choice.
-2. Navigate into the server directory `cd server`.
-3. Run `npm i` or `npm install` to install the packages.
-4. Run `npm start` to start the server.
-
-If configured correctly, you should see a message indicating that the server is running successfully and `Database Connected`.
-
-&nbsp;
-
-# Client Side Setup
-
-## Environment variables
-First, create the environment variables file `.env` in the client folder. The `.env` file contains the following environment variables:
-
-- VITE_APP_BASE_URL = `http://localhost:8800` #Note: Change the port 8800 to your port number.
-- VITE_APP_FIREBASE_API_KEY = `Firebase api key`
-
-## Steps to run client
-
-1. Navigate into the client directory `cd client`.
-2. Run `npm i` or `npm install` to install the packages.
-3. Run `npm start` to run the app on `http://localhost:3000`.
-4. Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-
-
-&nbsp;
-
-## For Support, Contact:
-
-- Email: codewavewithasante@gmail.com
-- Telegram Chat: [https://t.me/Codewave_with_asante](https://t.me/Codewave_with_asante)
