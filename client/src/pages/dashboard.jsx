@@ -75,7 +75,7 @@ const Dashboard = () => {
       </div>
 
       <div className="w-full bg-white my-16 p-4 rounded shadow-sm">
-        <h4 className="text-xl text-gray-600 font-semibold">
+        <h4 className="text-xl text-gray-600 font-semibold mb-10 ">
           กราฟแยกตามความสำคัญ
         </h4>
         <Chart />

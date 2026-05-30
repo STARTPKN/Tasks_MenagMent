@@ -63,5 +63,21 @@ export const TASK_TYPE_THAI = {
 
 export const ROLE_THAI = {
   Admin: "ผู้ดูแลระบบ",
+  ADMIN: "ผู้ดูแลระบบ",
+  Administrator: "ผู้ดูแลระบบ",
   User: "ผู้ใช้งาน",
+  USER: "ผู้ใช้งาน",
 };
+
+export const formatThaiDate = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("th-TH", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+};
+

@@ -28,7 +28,7 @@ const UserTable = ({ users }) => {
 
             <div>
               <p> {user.name}</p>
-              <span className="text-xs text-black">{ROLE_THAI[user?.role] || user?.role}</span>
+              <span className="text-xs text-black">{ROLE_THAI[user?.title] || user?.title}</span>
             </div>
           </div>
         </td>

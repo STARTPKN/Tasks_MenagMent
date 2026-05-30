@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Title from "../components/Title";
 import Button from "../components/Button";
 import { IoMdAdd } from "react-icons/io";
-import { getInitials } from "../utils";
+import { getInitials, ROLE_THAI } from "../utils";
 import clsx from "clsx";
 import ConfirmatioDialog from "../components/Dialogs";
 import AddUser from "../components/AddUser";
@@ -89,7 +89,7 @@ const Users = () => {
 
       <td className="p-2">{user.title}</td>
       <td className="p-2">{user.email}</td>
-      <td className="p-2">{user.role}</td>
+      <td className="p-2">{ROLE_THAI[user.role] || user.role}</td>
 
       <td className="p-2">
         <button

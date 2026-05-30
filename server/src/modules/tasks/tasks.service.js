@@ -46,6 +46,7 @@ export const tasksService = {
     if (data.stage) updateData.stage = data.stage;
     if (data.date) updateData.date = new Date(data.date);
     if (data.team) updateData.team = data.team;
+    if (data.assets) updateData.assets = data.assets;
 
     return tasksRepository.update(id, updateData);
   },

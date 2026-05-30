@@ -3,6 +3,8 @@ import ModalWrapper from "../ModalWrapper";
 import { Dialog } from "@headlessui/react";
 import Textbox from "../Textbox";
 import Button from "../Button";
+import { useAddSubTaskMutation } from "../../redux/slices/taskApiSlice";
+import { toast } from "sonner";
 
 const AddSubTask = ({ open, setOpen, id }) => {
   const {
@@ -11,19 +13,16 @@ const AddSubTask = ({ open, setOpen, id }) => {
     formState: { errors },
   } = useForm();
 
-  // const [addSbTask] = useCreateSubTaskMutation();
+  const [addSubTask, { isLoading }] = useAddSubTaskMutation();
 
   const handleOnSubmit = async (data) => {
-    // try {
-    //   const res = await addSbTask({ data, id }).unwrap();
-    //   toast.success(res.message);
-    //   setTimeout(() => {
-    //     setOpen(false);
-    //   }, 500);
-    // } catch (err) {
-    //   console.log(err);
-    //   toast.error(err?.data?.message || err.error);
-    // }
+    try {
+      await addSubTask({ id, data }).unwrap();
+      toast.success("เพิ่มงานย่อยสำเร็จ!");
+      setOpen(false);
+    } catch (err) {
+      toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาด");
+    }
   };
 
   return (
@@ -78,7 +77,7 @@ const AddSubTask = ({ open, setOpen, id }) => {
             <Button
               type='submit'
               className='bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 sm:ml-3 sm:w-auto'
-              label='เพิ่มงาน'
+              label={isLoading ? "กำลังเพิ่ม..." : "เพิ่มงาน"}
             />
 
             <Button

@@ -9,10 +9,10 @@ import { IoMdAdd } from "react-icons/io";
 import Tabs from "../components/Tabs";
 import TaskTitle from "../components/TaskTitle";
 import BoardView from "../components/BoardView";
-import { tasks } from "../assets/data";
 import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
 import { TASK_TYPE_THAI } from "../utils";
+import { useGetTasksQuery } from "../redux/slices/taskApiSlice";
 
 const TABS = [
   { title: "มุมมองกระดาน", icon: <MdGridView /> },
@@ -25,20 +25,37 @@ const TASK_TYPE = {
   completed: "bg-green-600",
 };
 
+// Map backend stage (e.g. "TODO", "IN_PROGRESS") to UI stage (e.g. "todo", "in progress")
+const mapStageToUI = (stage) => {
+  const s = stage?.toUpperCase();
+  if (s === "TODO") return "todo";
+  if (s === "IN_PROGRESS") return "in progress";
+  if (s === "COMPLETED") return "completed";
+  return stage?.toLowerCase() || "todo";
+};
+
 const Tasks = () => {
   const params = useParams();
+  const { data: tasksData, isLoading } = useGetTasksQuery();
 
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const status = params?.status || "";
 
-  const filteredTasks = status
-    ? tasks.filter((task) => task.stage.toLowerCase() === status.toLowerCase())
-    : tasks;
+  // Normalize tasks from DB: map stage to lowercase UI format
+  const allTasks = (tasksData?.data || []).map((task) => ({
+    ...task,
+    _id: task.id || task._id,
+    stage: mapStageToUI(task.stage),
+    priority: task.priority?.toLowerCase() || "normal",
+  }));
 
-  return loading ? (
+  const filteredTasks = status
+    ? allTasks.filter((task) => task.stage.toLowerCase() === status.toLowerCase())
+    : allTasks;
+
+  return isLoading ? (
     <div className='py-10'>
       <Loading />
     </div>

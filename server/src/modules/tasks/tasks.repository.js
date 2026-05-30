@@ -80,13 +80,19 @@ export const tasksRepository = {
   },
 
   update: async (id, data) => {
-    const { team, ...updateData } = data;
+    const { team, assets, ...updateData } = data;
 
     const updatePayload = { ...updateData };
 
     if (team) {
       updatePayload.team = {
         set: team.map((userId) => ({ id: userId })),
+      };
+    }
+
+    if (assets) {
+      updatePayload.assets = {
+        create: assets.map((url) => ({ url })),
       };
     }
 

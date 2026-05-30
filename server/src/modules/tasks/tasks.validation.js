@@ -16,6 +16,7 @@ export const updateTaskSchema = z.object({
   priority: z.enum(["HIGH", "MEDIUM", "NORMAL", "LOW"]).optional(),
   stage: z.enum(["TODO", "IN_PROGRESS", "COMPLETED"]).optional(),
   team: z.array(z.string()).optional(),
+  assets: z.array(z.string()).optional(),
 });
 
 export const createSubTaskSchema = z.object({

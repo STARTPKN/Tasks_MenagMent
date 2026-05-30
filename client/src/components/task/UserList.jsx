@@ -1,26 +1,37 @@
 import { Listbox, Transition } from "@headlessui/react";
 import { Fragment, useEffect, useState } from "react";
 import { BsChevronExpand } from "react-icons/bs";
-import { summary } from "../../assets/data";
+import { useGetUsersQuery } from "../../redux/slices/userApiSlice";
 import clsx from "clsx";
 import { getInitials } from "../../utils";
 import { MdCheck } from "react-icons/md";
 
 const UserList = ({ setTeam, team }) => {
-  const data = summary.users;
+  const { data: usersData } = useGetUsersQuery();
+  const data = usersData?.data || [];
   const [selectedUsers, setSelectedUsers] = useState([]);
 
   const handleChange = (el) => {
     setSelectedUsers(el);
-    setTeam(el?.map((u) => u._id));
+    setTeam(el?.map((u) => u.id || u._id));
   };
+
   useEffect(() => {
-    if (team?.length < 1) {
-      data && setSelectedUsers([data[0]]);
+    if (data.length === 0) return;
+
+    if (!team || team.length === 0) {
+      setSelectedUsers([data[0]]);
+      setTeam([data[0].id || data[0]._id]);
     } else {
-      setSelectedUsers(team);
+      const resolved = team
+        .map((t) => {
+          const idToMatch = typeof t === "string" ? t : (t.id || t._id);
+          return data.find((u) => u.id === idToMatch || u._id === idToMatch);
+        })
+        .filter(Boolean);
+      setSelectedUsers(resolved);
     }
-  }, []);
+  }, [team, data]);
 
   return (
     <div>

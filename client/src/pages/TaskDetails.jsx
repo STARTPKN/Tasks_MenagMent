@@ -9,17 +9,12 @@ import {
 } from "react-icons/md";
 import { RxActivityLog } from "react-icons/rx";
 import { useParams } from "react-router-dom";
-import { tasks } from "../assets/data";
+import { useGetTasksQuery } from "../redux/slices/taskApiSlice";
 import Tabs from "../components/Tabs";
-import { PRIOTITYSTYELS, TASK_TYPE, getInitials, PRIORITY_THAI, TASK_TYPE_THAI } from "../utils";
+import { PRIOTITYSTYELS, TASK_TYPE, getInitials, PRIORITY_THAI, TASK_TYPE_THAI, formatThaiDate } from "../utils";
 import Activities from "../components/task/Activities";
 
-const assets = [
-  "https://images.pexels.com/photos/2418664/pexels-photo-2418664.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://images.pexels.com/photos/8797307/pexels-photo-8797307.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://images.pexels.com/photos/2534523/pexels-photo-2534523.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  "https://images.pexels.com/photos/804049/pexels-photo-804049.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-];
+
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
@@ -42,7 +37,11 @@ const TaskDetails = () => {
   const { id } = useParams();
 
   const [selected, setSelected] = useState(0);
-  const task = tasks[3];
+  const { data: tasksData, isLoading } = useGetTasksQuery();
+  const task = (tasksData?.data || []).find((t) => t._id === id || t.id === id) || {};
+
+  const priority = task?.priority?.toLowerCase();
+  const stage = task?.stage?.toLowerCase()?.replace("_", " ");
 
   return (
     <div className='w-full flex flex-col gap-3 mb-4 overflow-y-hidden'>
@@ -58,27 +57,27 @@ const TaskDetails = () => {
                   <div
                     className={clsx(
                       "flex gap-1 items-center text-base font-semibold px-3 py-1 rounded-full",
-                      PRIOTITYSTYELS[task?.priority],
-                      bgColor[task?.priority]
+                      PRIOTITYSTYELS[priority],
+                      bgColor[priority]
                     )}
                   >
-                    <span className='text-lg'>{ICONS[task?.priority]}</span>
-                    <span className='uppercase'>ความสำคัญ {PRIORITY_THAI[task?.priority] || task?.priority}</span>
+                    <span className='text-lg'>{ICONS[priority]}</span>
+                    <span>ความสำคัญ {PRIORITY_THAI[priority] || task?.priority}</span>
                   </div>
 
                   <div className={clsx("flex items-center gap-2")}>
                     <div
                       className={clsx(
                         "w-4 h-4 rounded-full",
-                        TASK_TYPE[task.stage]
+                        TASK_TYPE[stage]
                       )}
                     />
-                    <span className='text-black uppercase'>{TASK_TYPE_THAI[task?.stage] || task?.stage}</span>
+                    <span className='text-black font-semibold'>{TASK_TYPE_THAI[stage] || task?.stage}</span>
                   </div>
                 </div>
 
                 <p className='text-gray-500'>
-                  สร้างเมื่อ: {new Date(task?.date).toDateString()}
+                  สร้างเมื่อ: {formatThaiDate(task?.date)}
                 </p>
 
                 <div className='flex items-center gap-8 p-4 border-y border-gray-200'>
@@ -138,7 +137,7 @@ const TaskDetails = () => {
                         <div className='space-y-1'>
                           <div className='flex gap-2 items-center'>
                             <span className='text-sm text-gray-500'>
-                              {new Date(el?.date).toDateString()}
+                              {formatThaiDate(el?.date)}
                             </span>
 
                             <span className='px-2 py-0.5 text-center text-sm rounded-full bg-violet-100 text-violet-700 font-semibold'>
@@ -161,7 +160,7 @@ const TaskDetails = () => {
                   {task?.assets?.map((el, index) => (
                     <img
                       key={index}
-                      src={el}
+                      src={el?.url || el}
                       alt={task?.title}
                       className='w-full rounded h-28 md:h-36 2xl:h-52 cursor-pointer transition-all duration-700 hover:scale-125 hover:z-50'
                     />

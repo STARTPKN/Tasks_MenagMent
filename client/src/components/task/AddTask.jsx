@@ -6,15 +6,34 @@ import { useForm } from "react-hook-form";
 import UserList from "./UserList";
 import SelectList from "../SelectList";
 import { BiImages } from "react-icons/bi";
+import { useUploadMultipleFilesMutation } from "../../redux/slices/uploadApiSlice";
 import Button from "../Button";
+import {
+  useCreateTaskMutation,
+  useUpdateTaskMutation,
+} from "../../redux/slices/taskApiSlice";
+import { toast } from "sonner";
 
 const LISTS = ["ที่ต้องทำ", "กำลังดำเนินการ", "เสร็จสิ้น"];
 const PRIORIRY = ["สูง", "ปานกลาง", "ปกติ", "ต่ำ"];
 
+const STAGE_MAP = {
+  "ที่ต้องทำ": "TODO",
+  "กำลังดำเนินการ": "IN_PROGRESS",
+  "เสร็จสิ้น": "COMPLETED",
+};
+
+const PRIORITY_MAP = {
+  "สูง": "HIGH",
+  "ปานกลาง": "MEDIUM",
+  "ปกติ": "NORMAL",
+  "ต่ำ": "LOW",
+};
+
 const mapStageToThai = (stage) => {
-  const s = stage?.toLowerCase();
+  const s = stage?.toLowerCase()?.replace("_", " ");
   if (s === "todo") return LISTS[0];
-  if (s === "in progress") return LISTS[1];
+  if (s === "in progress" || s === "in_progress") return LISTS[1];
   if (s === "completed") return LISTS[2];
   return LISTS[0];
 };
@@ -28,9 +47,10 @@ const mapPriorityToThai = (priority) => {
   return PRIORIRY[2];
 };
 
-const uploadedFileURLs = [];
-
 const AddTask = ({ open, setOpen, task = null }) => {
+  const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
+  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
+
   const {
     register,
     handleSubmit,
@@ -48,7 +68,51 @@ const AddTask = ({ open, setOpen, task = null }) => {
   const [assets, setAssets] = useState([]);
   const [uploading, setUploading] = useState(false);
 
-  const submitHandler = () => {};
+  // Note: Base64 conversion is no longer used; files will be uploaded directly to Cloudinary via the upload API.
+
+  const [uploadMultipleFiles] = useUploadMultipleFilesMutation();
+
+  const submitHandler = async (data) => {
+    try {
+      let assetUrls = [];
+      // If there are files selected, upload them first
+      if (assets && assets.length > 0) {
+        setUploading(true);
+        const uploadResult = await uploadMultipleFiles({ files: Array.from(assets) }).unwrap();
+        // uploadResult is expected to be an array of uploaded file info (e.g., URLs)
+        assetUrls = uploadResult.map((file) => file.url);
+        setUploading(false);
+      }
+
+      const basePayload = {
+        title: data.title,
+        date: data.date,
+        stage: STAGE_MAP[stage] || "TODO",
+        priority: PRIORITY_MAP[priority] || "NORMAL",
+        team: team.map((t) => (typeof t === "string" ? t : t.id || t._id)),
+        assets: assetUrls,
+      };
+
+      // If editing, preserve existing assets and merge new ones
+      const payload = task
+        ? { id: task.id || task._id, ...basePayload, assets: [...(task.assets || []), ...assetUrls] }
+        : basePayload;
+
+      if (task) {
+        await updateTask({ id: task.id || task._id, ...payload }).unwrap();
+        toast.success("แก้ไขงานสำเร็จ!");
+      } else {
+        await createTask(payload).unwrap();
+        toast.success("สร้างงานสำเร็จ!");
+      }
+      setOpen(false);
+      setAssets([]);
+    } catch (err) {
+      toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาด");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // reset local state when modal opens or task changes
   useEffect(() => {
@@ -62,7 +126,14 @@ const AddTask = ({ open, setOpen, task = null }) => {
   }, [task, open, reset]);
 
   const handleSelect = (e) => {
-    setAssets(e.target.files);
+    const newFiles = Array.from(e.target.files || []);
+    setAssets((prev) => [...prev, ...newFiles]);
+    // Reset input so the same file can be re-selected
+    e.target.value = "";
+  };
+
+  const removeFile = (index) => {
+    setAssets((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -130,14 +201,54 @@ const AddTask = ({ open, setOpen, task = null }) => {
                     className="hidden"
                     id="imgUpload"
                     onChange={(e) => handleSelect(e)}
-                    accept=".jpg, .png, .jpeg"
+                    accept=".jpg,.png,.jpeg,.gif,.webp,.pdf,.doc,.docx"
                     multiple={true}
                   />
                   <BiImages />
                   <span>เพิ่มไฟล์แนบ</span>
+                  {assets.length > 0 && (
+                    <span className="ml-1 bg-blue-500 text-white text-xs rounded-full px-2 py-0.5">
+                      {assets.length}
+                    </span>
+                  )}
                 </label>
               </div>
             </div>
+
+            {/* File Preview */}
+            {assets.length > 0 && (
+              <div className="border border-gray-200 rounded-lg p-3 space-y-2">
+                <p className="text-sm font-semibold text-gray-600">
+                  ไฟล์ที่เลือก ({assets.length} ไฟล์):
+                </p>
+                <div className="space-y-1 max-h-32 overflow-y-auto">
+                  {assets.map((file, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between bg-gray-50 rounded px-3 py-1.5 text-sm"
+                    >
+                      <div className="flex items-center gap-2 truncate">
+                        <span className="text-blue-500">
+                          {file.type?.startsWith("image/") ? "🖼️" : "📄"}
+                        </span>
+                        <span className="truncate text-gray-700">{file.name}</span>
+                        <span className="text-gray-400 text-xs flex-shrink-0">
+                          ({(file.size / 1024).toFixed(0)} KB)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeFile(index)}
+                        className="text-red-400 hover:text-red-600 ml-2 flex-shrink-0"
+                        title="ลบไฟล์"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="bg-gray-50 py-6 sm:flex sm:flex-row-reverse gap-4">
               {uploading ? (
