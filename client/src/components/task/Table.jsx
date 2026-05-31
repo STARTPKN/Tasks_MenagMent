@@ -25,7 +25,8 @@ import { RiFileEditLine } from "react-icons/ri";
 import { useTrashTaskMutation } from "../../redux/slices/taskApiSlice";
 import { useGetSettingsQuery } from "../../redux/slices/settingsApiSlice";
 import { useSelector } from "react-redux";
-
+import { FaRegEdit } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
   medium: <MdKeyboardArrowUp />,
@@ -143,20 +144,22 @@ const Table = ({ tasks }) => {
         </td>
 
         {(canEdit || canDelete) && (
-          <td className="py-2 flex gap-2 md:gap-4 justify-end">
+          <td className="py-2 flex gap-2 md:gap-4 justify-end ">
+           
             {canEdit && (
               <Button
-                className="text-yellow-500 hover:text-yellow-600 sm:px-0 text-sm md:text-base"
-                label="แก้ไข"
+                className="text-blue-500 hover:text-blue-600 sm:px-0 text-sm md:text-base"
+                label={<FaRegEdit  size={25} />}
                 type="button"
                 onClick={() => editClick(task)}
               />
             )}
+            
 
             {canDelete && (
               <Button
-                className="text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base"
-                label="ลบ"
+                className="text-red-600 hover:text-red-500 sm:px-0 text-sm md:text-base"
+                label={<FaTrash size={25} />}
                 type="button"
                 onClick={() => deleteClicks(task._id)}
               />

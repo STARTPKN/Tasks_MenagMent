@@ -9,7 +9,8 @@ import {
 } from "../redux/slices/positionApiSlice";
 import { toast } from "sonner";
 import { IoMdAdd } from "react-icons/io";
-
+import { FaTrash } from "react-icons/fa";
+import { FaRegEdit } from "react-icons/fa";
 const PositionsTable = () => {
   const { data, isLoading, error } = useGetPositionsQuery();
   const [deletePosition] = useDeletePositionMutation();
@@ -58,13 +59,13 @@ const PositionsTable = () => {
       <td className="p-2 flex gap-4 justify-end">
         <Button
           className="text-blue-600 hover:text-blue-500 font-semibold sm:px-0"
-          label="แก้ไข"
+          label={<FaRegEdit size={25} />}
           type="button"
           onClick={() => editClick(position)}
         />
         <Button
-          className="text-red-700 hover:text-red-500 font-semibold sm:px-0"
-          label="ลบ"
+          className="text-red-600 hover:text-red-500 font-semibold sm:px-0"
+          label={<FaTrash size={25} />}
           type="button"
           onClick={() => deleteClick(position.id)}
         />
