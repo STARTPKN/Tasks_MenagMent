@@ -20,6 +20,53 @@ import {
   useDeleteTaskMutation,
   useDeleteAllTrashedMutation,
 } from "../redux/slices/taskApiSlice";
+import { useSearchParams } from "react-router-dom";
+
+const ICONS = {
+  high: <MdKeyboardDoubleArrowUp />,
+  medium: <MdKeyboardArrowUp />,
+  low: <MdKeyboardArrowDown />,
+};
+
+const Trash = () => {
+  const [openDialog, setOpenDialog] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [msg, setMsg] = useState(null);
+  const [type, setType] = useState("delete");
+  const [selected, setSelected] = useState("");
+
+  const { data, isLoading, refetch } = useGetTrashedTasksQuery();
+  const [restoreTask] = useRestoreTaskMutation();
+  const [restoreAllTasks] = useRestoreAllTasksMutation();
+  const [deleteTask] = useDeleteTaskMutation();
+  const [deleteAllTrashed] = useDeleteAllTrashedMutation();
+
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") || "";
+
+  // กรองรายการในถังขยะตามคำค้นหา
+  const allTrashed = data?.data || [];
+  const filteredTrashed = allTrashed.filter((task) => {
+    if (!searchTerm) return true;
+    const lowerSearch = searchTerm.toLowerCase();
+
+    // ค้นหาจากชื่องาน
+    const matchTitle = task.title?.toLowerCase().includes(lowerSearch);
+
+    // ค้นหาจากความสำคัญ (ภาษาอังกฤษและไทย)
+    const priority = task.priority?.toLowerCase() || "normal";
+    const priorityThai = PRIORITY_THAI[priority] || "";
+    const matchPriority = priority.includes(lowerSearch) ||
+      priorityThai.includes(lowerSearch);
+
+    // ค้นหาจากสถานะ (ภาษาอังกฤษและไทย)
+    const stageUI = task.stage?.toLowerCase().replace("_", " ") || "todo";
+    const stageThai = TASK_TYPE_THAI[stageUI] || "";
+    const matchStage = stageUI.includes(lowerSearch) ||
+      stageThai.includes(lowerSearch);
+
+    return matchTitle || matchPriority || matchStage;
+  });
 
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,

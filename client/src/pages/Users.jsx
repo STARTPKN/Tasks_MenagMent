@@ -18,6 +18,7 @@ import {
   useToggleUserStatusMutation,
 } from "../redux/slices/userApiSlice";
 import { toast } from "sonner";
+import { useSearchParams } from "react-router-dom";
 
 const TABS = [
   { title: "สมาชิก", icon: <FaUserFriends /> },
@@ -35,7 +36,32 @@ const Users = () => {
   const [selected, setSelected] = useState(null);
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const usersList = data?.data || [];
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") || "";
+
+  const allUsers = data?.data || [];
+
+  // กรองรายชื่อผู้ใช้ตามคำค้นหา
+  const usersList = allUsers.filter((user) => {
+    if (!searchTerm) return true;
+    const lowerSearch = searchTerm.toLowerCase();
+
+    // ค้นหาจากชื่อ
+    const matchName = user.name?.toLowerCase().includes(lowerSearch);
+    // ค้นหาจากตำแหน่ง
+    const matchTitle = user.title?.toLowerCase().includes(lowerSearch);
+    // ค้นหาจากอีเมล
+    const matchEmail = user.email?.toLowerCase().includes(lowerSearch);
+    // ค้นหาจากบทบาท (ภาษาอังกฤษและไทย)
+    const roleThai = ROLE_THAI[user.role] || "";
+    const matchRole = user.role?.toLowerCase().includes(lowerSearch) ||
+      roleThai.includes(lowerSearch);
+    // ค้นหาจากสถานะ
+    const statusText = user.isActive ? "ใช้งานปกติ" : "ระงับใช้งาน";
+    const matchStatus = statusText.includes(lowerSearch);
+
+    return matchName || matchTitle || matchEmail || matchRole || matchStatus;
+  });
 
   const deleteHandler = async () => {
     try {

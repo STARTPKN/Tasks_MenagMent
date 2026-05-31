@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { FaList } from "react-icons/fa";
 import { MdGridView } from "react-icons/md";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import Loading from "../components/Loader";
 import Title from "../components/Title";
 import Button from "../components/Button";
@@ -12,7 +12,7 @@ import BoardView from "../components/BoardView";
 import KanbanBoardView from "../components/KanbanBoardView";
 import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
-import { TASK_TYPE_THAI } from "../utils";
+import { TASK_TYPE_THAI, PRIORITY_THAI } from "../utils";
 import { useGetTasksQuery } from "../redux/slices/taskApiSlice";
 import { useGetSettingsQuery } from "../redux/slices/settingsApiSlice";
 import { useSelector } from "react-redux";
@@ -42,6 +42,8 @@ const mapStageToUI = (stage) => {
 
 const Tasks = () => {
   const params = useParams();
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") || "";
   const { data: tasksData, isLoading } = useGetTasksQuery();
   const { data: settings } = useGetSettingsQuery();
   const { user } = useSelector((state) => state.auth);
@@ -67,9 +69,44 @@ const Tasks = () => {
     priority: task.priority?.toLowerCase() || "normal",
   }));
 
-  const filteredTasks = status
-    ? allTasks.filter((task) => task.stage.toLowerCase() === status.toLowerCase())
-    : allTasks;
+  const filteredTasks = allTasks.filter((task) => {
+    const matchStatus = status ? task.stage.toLowerCase() === status.toLowerCase() : true;
+    
+    let matchSearch = true;
+    if (searchTerm) {
+      const lowerSearch = searchTerm.toLowerCase();
+      
+      // ค้นหาจากชื่องาน
+      const matchTitle = task.title?.toLowerCase().includes(lowerSearch);
+      
+      // ค้นหาจากชื่อ/ตำแหน่ง/อีเมลของสมาชิกทีม
+      const matchTeam = task.team?.some(member => 
+        member.name?.toLowerCase().includes(lowerSearch) || 
+        member.title?.toLowerCase().includes(lowerSearch) ||
+        member.email?.toLowerCase().includes(lowerSearch)
+      );
+      
+      // ค้นหาจากชื่อและแท็กของงานย่อย
+      const matchSubTasks = task.subTasks?.some(sub => 
+        sub.title?.toLowerCase().includes(lowerSearch) ||
+        sub.tag?.toLowerCase().includes(lowerSearch)
+      );
+
+      // ค้นหาจากระดับความสำคัญ (ภาษาอังกฤษและไทย)
+      const priorityThai = PRIORITY_THAI[task.priority] || "";
+      const matchPriority = task.priority?.toLowerCase().includes(lowerSearch) ||
+        priorityThai.includes(lowerSearch);
+
+      // ค้นหาจากสถานะ (ภาษาอังกฤษและไทย)
+      const stageThai = TASK_TYPE_THAI[task.stage] || "";
+      const matchStage = task.stage?.toLowerCase().includes(lowerSearch) ||
+        stageThai.includes(lowerSearch);
+      
+      matchSearch = matchTitle || matchTeam || matchSubTasks || matchPriority || matchStage;
+    }
+    
+    return matchStatus && matchSearch;
+  });
 
   return isLoading ? (
     <div className='py-10'>
