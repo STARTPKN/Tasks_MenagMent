@@ -18,16 +18,16 @@ const LISTS = ["ที่ต้องทำ", "กำลังดำเนิน
 const PRIORIRY = ["สูง", "ปานกลาง", "ปกติ", "ต่ำ"];
 
 const STAGE_MAP = {
-  "ที่ต้องทำ": "TODO",
-  "กำลังดำเนินการ": "IN_PROGRESS",
-  "เสร็จสิ้น": "COMPLETED",
+  ที่ต้องทำ: "TODO",
+  กำลังดำเนินการ: "IN_PROGRESS",
+  เสร็จสิ้น: "COMPLETED",
 };
 
 const PRIORITY_MAP = {
-  "สูง": "HIGH",
-  "ปานกลาง": "MEDIUM",
-  "ปกติ": "NORMAL",
-  "ต่ำ": "LOW",
+  สูง: "HIGH",
+  ปานกลาง: "MEDIUM",
+  ปกติ: "NORMAL",
+  ต่ำ: "LOW",
 };
 
 const mapStageToThai = (stage) => {
@@ -63,7 +63,9 @@ const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
     },
   });
   const [team, setTeam] = useState(task?.team || []);
-  const [stage, setStage] = useState(initialStage || mapStageToThai(task?.stage));
+  const [stage, setStage] = useState(
+    initialStage || mapStageToThai(task?.stage),
+  );
   const [priority, setPriority] = useState(mapPriorityToThai(task?.priority));
   const [assets, setAssets] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -78,7 +80,9 @@ const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
       // If there are files selected, upload them first
       if (assets && assets.length > 0) {
         setUploading(true);
-        const uploadResult = await uploadMultipleFiles({ files: Array.from(assets) }).unwrap();
+        const uploadResult = await uploadMultipleFiles({
+          files: Array.from(assets),
+        }).unwrap();
         // uploadResult is expected to be an array of uploaded file info (e.g., URLs)
         assetUrls = uploadResult.map((file) => file.url);
         setUploading(false);
@@ -95,7 +99,13 @@ const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
 
       // If editing, preserve existing assets and merge new ones
       const payload = task
-        ? { ...basePayload, assets: [...(task.assets || []), ...assetUrls] }
+        ? {
+            ...basePayload,
+            assets: [
+              ...(task.assets || []).map((a) => a.url || a),
+              ...assetUrls,
+            ],
+          }
         : basePayload;
 
       if (task) {
@@ -108,7 +118,15 @@ const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
       setOpen(false);
       setAssets([]);
     } catch (err) {
-      toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาด");
+      // Handle validation errors
+      if (err?.data?.errors && Array.isArray(err.data.errors)) {
+        const errorMsg = err.data.errors
+          .map((e) => `${e.field}: ${e.message}`)
+          .join(", ");
+        toast.error(`ข้อผิดพลาดในการตรวจสอบ: ${errorMsg}`);
+      } else {
+        toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาด");
+      }
     } finally {
       setUploading(false);
     }
@@ -121,7 +139,7 @@ const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
       date: task?.date ? task.date.split("T")[0] : "",
     });
     setTeam(task?.team || []);
-    setStage(task ? mapStageToThai(task?.stage) : (initialStage || LISTS[0]));
+    setStage(task ? mapStageToThai(task?.stage) : initialStage || LISTS[0]);
     setPriority(mapPriorityToThai(task?.priority));
   }, [task, open, reset, initialStage]);
 
@@ -231,7 +249,9 @@ const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
                         <span className="text-blue-500">
                           {file.type?.startsWith("image/") ? "🖼️" : "📄"}
                         </span>
-                        <span className="truncate text-gray-700">{file.name}</span>
+                        <span className="truncate text-gray-700">
+                          {file.name}
+                        </span>
                         <span className="text-gray-400 text-xs flex-shrink-0">
                           ({(file.size / 1024).toFixed(0)} KB)
                         </span>
