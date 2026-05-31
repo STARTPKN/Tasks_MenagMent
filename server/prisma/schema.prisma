@@ -7,6 +7,7 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// โมเดลผู้ใช้ (User) สำหรับการเก็บข้อมูลเกี่ยวกับผู้ใช้ในระบบ เช่น อีเมล, ชื่อ, รหัสผ่าน, บทบาท, และข้อมูลอื่น ๆ ที่เกี่ยวข้องกับผู้ใช้
 model User {
   id            String         @id @default(uuid())
   email         String         @unique
@@ -22,6 +23,7 @@ model User {
   notifications Notification[]
 }
 
+// งานหลัก (Task) สำหรับการเก็บข้อมูลเกี่ยวกับงานหลักที่ต้องทำ เช่น ชื่อเรื่อง, วันที่, ความสำคัญ, สถานะ, และข้อมูลอื่น ๆ ที่เกี่ยวข้องกับงานหลัก
 model Task {
   id            String         @id @default(uuid())
   title         String
@@ -38,6 +40,7 @@ model Task {
   notifications Notification[]
 }
 
+// งานย่อย (SubTask) สำหรับการเก็บข้อมูลเกี่ยวกับงานย่อยที่เกี่ยวข้องกับงานหลัก เช่น งานที่ต้องทำในแต่ละขั้นตอนของงานหลัก หรือรายละเอียดเพิ่มเติมของงานหลัก
 model SubTask {
   id     String   @id @default(uuid())
   title  String
@@ -46,7 +49,7 @@ model SubTask {
   taskId String
   task   Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
-
+// กิจกรรม (Activity) สำหรับการเก็บข้อมูลเกี่ยวกับกิจกรรมที่เกิดขึ้นในระบบ เช่น การเริ่มงาน, การทำงาน, การเสร็จสิ้น, การแสดงความคิดเห็น, หรือกิจกรรมอื่น ๆ ที่เกี่ยวข้องกับผู้ใช้และงาน
 model Activity {
   id         String   @id @default(uuid())
   type       String   @default("commented") // started, completed, in_progress, commented, bug, assigned
@@ -58,6 +61,7 @@ model Activity {
   task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
+// ไฟล์แนบ (Asset) สำหรับการเก็บข้อมูลเกี่ยวกับไฟล์ที่แนบมากับงาน เช่น รูปภาพ, เอกสาร, หรือไฟล์อื่น ๆ ที่เกี่ยวข้องกับงาน
 model Asset {
   id     String @id @default(uuid())
   url    String
@@ -65,6 +69,7 @@ model Asset {
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
+// การแจ้งเตือน (Notification) สำหรับการเก็บข้อมูลเกี่ยวกับการแจ้งเตือนที่เกิดขึ้นในระบบ เช่น การมอบหมายงาน, การแสดงความคิดเห็น, หรือกิจกรรมอื่น ๆ ที่เกี่ยวข้องกับผู้ใช้และงาน
 model Notification {
   id        String   @id @default(uuid())
   type      String   // "assigned" | "activity"
@@ -79,11 +84,21 @@ model Notification {
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
 
+// การตั้งค่าระบบ (SystemSetting) สำหรับเก็บค่าต่าง ๆ ที่ใช้ในการกำหนดพฤติกรรมของระบบ เช่น การตั้งค่าเกี่ยวกับการแจ้งเตือน, การตั้งค่าเกี่ยวกับการแสดงผล, หรือการตั้งค่าอื่น ๆ ที่จำเป็นสำหรับการทำงานของระบบ
 model SystemSetting {
   id        String   @id @default(uuid())
   key       String   @unique
   value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// ตำแหน่งงาน (Position) สำหรับการกำหนดสิทธิ์การเข้าถึงและบทบาทของผู้ใช้ในระบบ
+model Position {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 

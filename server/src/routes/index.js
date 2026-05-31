@@ -5,7 +5,7 @@ import tasksRoutes from "../modules/tasks/routes/tasks.routes.js";
 import uploadRoutes from "../modules/upload/upload.routes.js";
 import notificationRoutes from "../modules/notifications/routes/notifications.routes.js";
 import settingsRoutes from "../modules/settings/routes/settings.routes.js";
-
+import positionRoutes from "../modules/positions/positionRoutes.js";
 const router = Router();
 
 // Health check
@@ -24,5 +24,6 @@ router.use("/tasks", tasksRoutes);
 router.use("/upload", uploadRoutes);
 router.use("/notifications", notificationRoutes);
 router.use("/settings", settingsRoutes);
+router.use("/positions", positionRoutes);
 
 export default router;

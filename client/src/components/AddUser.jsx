@@ -13,6 +13,7 @@ import {
 } from "../redux/slices/userApiSlice";
 import { setCredentials } from "../redux/slices/authSlice";
 import { toast } from "sonner";
+import { useGetPositionsQuery } from "../redux/slices/positionApiSlice";
 
 const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
   let defaultValues = userData ?? {};
@@ -23,6 +24,9 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
     useUpdateProfileMutation();
   const [createUser, { isLoading: isCreatingUser }] = useCreateUserMutation();
   const [updateUser, { isLoading: isUpdatingUser }] = useUpdateUserMutation();
+
+  const { data: positionsData, isLoading: isLoadingPositions } = useGetPositionsQuery();
+  const positionsList = positionsData?.data || [];
 
   const isLoading = isCreatingUser || isUpdatingUser || isUpdatingProfile;
 
@@ -113,17 +117,35 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
               })}
               error={errors.name ? errors.name.message : ""}
             />
-            <Textbox
-              placeholder="ตำแหน่ง"
-              type="text"
-              name="title"
-              label="ตำแหน่ง"
-              className="w-full rounded"
-              register={register("title", {
-                required: "กรุณาระบุตำแหน่ง!",
-              })}
-              error={errors.title ? errors.title.message : ""}
-            />
+            
+            <div className="w-full">
+              <label className="text-slate-900 dark:text-gray-500 mb-1 block text-sm">ตำแหน่ง</label>
+              {isLoadingPositions ? (
+                <p className="text-sm text-gray-500">กำลังโหลดตำแหน่ง...</p>
+              ) : (
+                <select
+                  name="title"
+                  {...register("title", {
+                    required: "กรุณาระบุตำแหน่ง!",
+                  })}
+                  className="w-full rounded px-3 py-2 border border-gray-300 text-sm focus:ring-1 focus:ring-blue-600 outline-none"
+                >
+                  <option value="">-- เลือกตำแหน่ง --</option>
+                  {positionsList.map((pos) => (
+                    <option key={pos.id} value={pos.name}>
+                      {pos.name}
+                    </option>
+                  ))}
+                  {userData?.title && !positionsList.find(p => p.name === userData.title) && (
+                    <option value={userData.title}>{userData.title} (ข้อมูลเดิม)</option>
+                  )}
+                </select>
+              )}
+              {errors.title && (
+                <span className="text-xs text-[#f64949fe] mt-0.5 block">{errors.title.message}</span>
+              )}
+            </div>
+
             <Textbox
               placeholder="อีเมล"
               type="email"

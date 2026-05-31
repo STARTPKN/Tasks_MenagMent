@@ -4,6 +4,10 @@ import Button from "../components/Button";
 import { IoMdAdd } from "react-icons/io";
 import { getInitials, ROLE_THAI } from "../utils";
 import clsx from "clsx";
+import { FaUserFriends } from "react-icons/fa";
+import { MdWork } from "react-icons/md";
+import Tabs from "../components/Tabs";
+import PositionsTable from "../components/PositionsTable";
 import ConfirmatioDialog from "../components/Dialogs";
 import AddUser from "../components/AddUser";
 import ChangePasswordDialog from "../components/ChangePasswordDialog";
@@ -15,6 +19,11 @@ import {
 } from "../redux/slices/userApiSlice";
 import { toast } from "sonner";
 
+const TABS = [
+  { title: "สมาชิก", icon: <FaUserFriends /> },
+  { title: "ตำแหน่ง", icon: <MdWork /> },
+];
+
 const Users = () => {
   const { data, isLoading, error } = useGetUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
@@ -24,6 +33,7 @@ const Users = () => {
   const [open, setOpen] = useState(false);
   const [openPasswordDialog, setOpenPasswordDialog] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [selectedTab, setSelectedTab] = useState(0);
 
   const usersList = data?.data || [];
 
@@ -134,40 +144,51 @@ const Users = () => {
     <>
       <div className="w-full md:px-1 px-0 mb-6">
         <div className="flex items-center justify-between mb-8">
-          <Title title="สมาชิกทีม" />
-          <Button
-            label="เพิ่มผู้ใช้"
-            icon={<IoMdAdd className="text-lg" />}
-            className="flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md 2xl:py-2.5 px-4 font-semibold text-sm hover:bg-blue-700 transition-colors"
-            onClick={() => {
-              setSelected(null);
-              setOpen(true);
-            }}
-          />
+          <Title title="ทีม" />
+          {selectedTab === 0 && (
+            <Button
+              label="เพิ่มผู้ใช้"
+              icon={<IoMdAdd className="text-lg" />}
+              className="flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md 2xl:py-2.5 px-4 font-semibold text-sm hover:bg-blue-700 transition-colors"
+              onClick={() => {
+                setSelected(null);
+                setOpen(true);
+              }}
+            />
+          )}
         </div>
 
-        {isLoading ? (
-          <div className="w-full py-20 flex items-center justify-center">
-            <Loader />
-          </div>
-        ) : error ? (
-          <div className="w-full py-10 text-center text-red-500 font-semibold">
-            Failed to load users: {error?.data?.message || "Connection error"}
-          </div>
-        ) : (
-          <div className="bg-white px-2 md:px-4 py-4 shadow-md rounded">
-            <div className="overflow-x-auto">
-              <table className="w-full mb-5">
-                <TableHeader />
-                <tbody>
-                  {usersList.map((user) => (
-                    <TableRow key={user.id} user={user} />
-                  ))}
-                </tbody>
-              </table>
+        <Tabs tabs={TABS} setSelected={setSelectedTab}>
+          {selectedTab === 0 ? (
+            isLoading ? (
+              <div className="w-full py-20 flex items-center justify-center">
+                <Loader />
+              </div>
+            ) : error ? (
+              <div className="w-full py-10 text-center text-red-500 font-semibold">
+                Failed to load users:{" "}
+                {error?.data?.message || "Connection error"}
+              </div>
+            ) : (
+              <div className="bg-white px-2 md:px-4 py-4 shadow-md rounded">
+                <div className="overflow-x-auto">
+                  <table className="w-full mb-5">
+                    <TableHeader />
+                    <tbody>
+                      {usersList.map((user) => (
+                        <TableRow key={user.id} user={user} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )
+          ) : (
+            <div className="w-full">
+              <PositionsTable />
             </div>
-          </div>
-        )}
+          )}
+        </Tabs>
       </div>
 
       <AddUser
