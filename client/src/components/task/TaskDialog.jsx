@@ -9,6 +9,10 @@ import { Menu, Transition } from "@headlessui/react";
 import AddTask from "./AddTask";
 import AddSubTask from "./AddSubTask";
 import ConfirmatioDialog from "../Dialogs";
+import { useTrashTaskMutation } from "../../redux/slices/taskApiSlice";
+import { useGetSettingsQuery } from "../../redux/slices/settingsApiSlice";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 const TaskDialog = ({ task }) => {
   const [open, setOpen] = useState(false);
@@ -17,9 +21,27 @@ const TaskDialog = ({ task }) => {
 
   const navigate = useNavigate();
 
+  const { data: settings } = useGetSettingsQuery();
+  const { user } = useSelector((state) => state.auth);
+  const canEdit = user?.role === "ADMIN" || settings?.data?.allowUsersEditTasks === "true" || settings?.data?.allowUsersEditTasks === true;
+  const canDelete = user?.role === "ADMIN" || settings?.data?.allowUsersDeleteTasks === "true" || settings?.data?.allowUsersDeleteTasks === true;
+
   const duplicateHandler = () => {};
-  const deleteClicks = () => {};
-  const deleteHandler = () => {};
+  const [trashTask] = useTrashTaskMutation();
+
+  const deleteClicks = () => {
+    setOpenDialog(true);
+  };
+
+  const deleteHandler = async () => {
+    try {
+      await trashTask(task._id).unwrap();
+      toast.success("ย้ายงานลงถังขยะเรียบร้อยแล้ว");
+      setOpenDialog(false);
+    } catch (error) {
+      toast.error(error?.data?.message || "เกิดข้อผิดพลาดในการลบงาน");
+    }
+  };
 
   const items = [
     {
@@ -27,11 +49,11 @@ const TaskDialog = ({ task }) => {
       icon: <AiTwotoneFolderOpen className="mr-2 h-5 w-5" aria-hidden="true" />,
       onClick: () => navigate(`/task/${task._id}`),
     },
-    {
+    ...(canEdit ? [{
       label: "แก้ไขงาน",
       icon: <MdOutlineEdit className="mr-2 h-5 w-5" aria-hidden="true" />,
       onClick: () => setOpenEdit(true),
-    },
+    }] : []),
     {
       label: "เพิ่มงานย่อย",
       icon: <MdAdd className="mr-2 h-5 w-5" aria-hidden="true" />,
@@ -80,24 +102,26 @@ const TaskDialog = ({ task }) => {
                 ))}
               </div>
 
-              <div className="px-1 py-1">
-                <Menu.Item>
-                  {({ active }) => (
-                    <button
-                      onClick={() => deleteClicks()}
-                      className={`${
-                        active ? "bg-blue-500 text-white" : "text-red-900"
-                      } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                    >
-                      <RiDeleteBin6Line
-                        className="mr-2 h-5 w-5 text-red-400"
-                        aria-hidden="true"
-                      />
-                      ลบ
-                    </button>
-                  )}
-                </Menu.Item>
-              </div>
+              {canDelete && (
+                <div className="px-1 py-1">
+                  <Menu.Item>
+                    {({ active }) => (
+                      <button
+                        onClick={() => deleteClicks()}
+                        className={`${
+                          active ? "bg-blue-500 text-white" : "text-red-900"
+                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                      >
+                        <RiDeleteBin6Line
+                          className="mr-2 h-5 w-5 text-red-400"
+                          aria-hidden="true"
+                        />
+                        ลบ
+                      </button>
+                    )}
+                  </Menu.Item>
+                </div>
+              )}
             </Menu.Items>
           </Transition>
         </Menu>

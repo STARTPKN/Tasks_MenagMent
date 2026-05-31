@@ -95,7 +95,7 @@ const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
 
       // If editing, preserve existing assets and merge new ones
       const payload = task
-        ? { id: task.id || task._id, ...basePayload, assets: [...(task.assets || []), ...assetUrls] }
+        ? { ...basePayload, assets: [...(task.assets || []), ...assetUrls] }
         : basePayload;
 
       if (task) {

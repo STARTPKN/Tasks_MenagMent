@@ -6,6 +6,8 @@ import {
   deleteFile,
 } from "./upload.controller.js";
 import { protect } from "../../middleware/auth.middleware.js";
+import settingsService from "../settings/settings.service.js";
+import { AppError } from "../../utils/index.js";
 
 const router = express.Router();
 
@@ -39,6 +41,18 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
 });
 
+const checkFileUploadSetting = async (req, res, next) => {
+  try {
+    const enableFileUpload = await settingsService.getSetting("enableFileUpload");
+    if (enableFileUpload !== "true") {
+      return next(new AppError("การอัปโหลดไฟล์ถูกปิดใช้งานโดยผู้ดูแลระบบ", 403));
+    }
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * Upload single file
  * POST /api/upload/file
@@ -48,6 +62,7 @@ const upload = multer({
 router.post(
   "/file",
   protect,
+  checkFileUploadSetting,
   (req, res, next) => {
     upload.single("file")(req, res, (err) => {
       if (err) {
@@ -71,6 +86,7 @@ router.post(
 router.post(
   "/files",
   protect,
+  checkFileUploadSetting,
   (req, res, next) => {
     upload.array("files", 10)(req, res, (err) => {
       if (err) {

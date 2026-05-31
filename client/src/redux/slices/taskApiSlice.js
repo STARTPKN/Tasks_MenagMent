@@ -40,6 +40,41 @@ export const taskApiSlice = apiSlice.injectEndpoints({
       }),
       providesTags: ["Tasks"],
     }),
+    getTrashedTasks: builder.query({
+      query: () => ({
+        url: "/tasks/trashed",
+        method: "GET",
+      }),
+      providesTags: ["Tasks"],
+    }),
+    trashTask: builder.mutation({
+      query: (id) => ({
+        url: `/tasks/${id}/trash`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+    restoreTask: builder.mutation({
+      query: (id) => ({
+        url: `/tasks/${id}/restore`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+    restoreAllTasks: builder.mutation({
+      query: () => ({
+        url: "/tasks/restore-all",
+        method: "POST",
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+    deleteAllTrashed: builder.mutation({
+      query: () => ({
+        url: "/tasks/trash/delete-all",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
     // New endpoint: add sub‑task to a task
     addSubTask: builder.mutation({
       // `arg` should be an object like { id: taskId, data: subTaskData }
@@ -86,5 +121,10 @@ export const {
   usePostTaskActivityMutation,
   useUpdateSubTaskMutation,
   useDeleteSubTaskMutation,
+  useGetTrashedTasksQuery,
+  useTrashTaskMutation,
+  useRestoreTaskMutation,
+  useRestoreAllTasksMutation,
+  useDeleteAllTrashedMutation,
 } = taskApiSlice;
 

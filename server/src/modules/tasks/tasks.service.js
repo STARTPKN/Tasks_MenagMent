@@ -1,6 +1,7 @@
 import { AppError } from "../../utils/index.js";
 import tasksRepository from "./tasks.repository.js";
 import notificationsService from "../notifications/notifications.service.js";
+import settingsService from "../settings/settings.service.js";
 
 export const tasksService = {
   getAllTasks: async (stage) => {
@@ -20,6 +21,11 @@ export const tasksService = {
   },
 
   createTask: async (data, currentUser) => {
+    const allowUsersCreateTasks = await settingsService.getSetting("allowUsersCreateTasks");
+    if (allowUsersCreateTasks !== "true" && currentUser?.role !== "ADMIN") {
+      throw new AppError("เฉพาะผู้ดูแลระบบเท่านั้นที่สามารถสร้างงานได้", 403);
+    }
+
     const taskData = {
       title: data.title,
       priority: data.priority || "NORMAL",
@@ -48,6 +54,11 @@ export const tasksService = {
   },
 
   updateTask: async (id, data, currentUser) => {
+    const allowUsersEditTasks = await settingsService.getSetting("allowUsersEditTasks");
+    if (allowUsersEditTasks !== "true" && currentUser?.role !== "ADMIN") {
+      throw new AppError("การแก้ไขงานถูกปิดใช้งานโดยผู้ดูแลระบบ", 403);
+    }
+
     const task = await tasksRepository.findById(id);
     if (!task) {
       throw new AppError("Task not found", 404);
@@ -81,7 +92,12 @@ export const tasksService = {
     return updatedTask;
   },
 
-  trashTask: async (id) => {
+  trashTask: async (id, currentUser) => {
+    const allowUsersDeleteTasks = await settingsService.getSetting("allowUsersDeleteTasks");
+    if (allowUsersDeleteTasks !== "true" && currentUser?.role !== "ADMIN") {
+      throw new AppError("การลบงานถูกปิดใช้งานโดยผู้ดูแลระบบ", 403);
+    }
+
     const task = await tasksRepository.findById(id);
     if (!task) {
       throw new AppError("Task not found", 404);
@@ -121,6 +137,13 @@ export const tasksService = {
     const task = await tasksRepository.findById(taskId);
     if (!task) {
       throw new AppError("Task not found", 404);
+    }
+
+    const maxSubTasksStr = await settingsService.getSetting("maxSubTasks");
+    const maxSubTasks = parseInt(maxSubTasksStr, 10);
+    
+    if (task.subTasks && task.subTasks.length >= maxSubTasks) {
+      throw new AppError(`ไม่สามารถสร้างงานย่อยเกิน ${maxSubTasks} งานได้`, 400);
     }
 
     const subTaskData = {

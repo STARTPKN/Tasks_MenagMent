@@ -13,6 +13,8 @@ import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
 import { TASK_TYPE_THAI } from "../utils";
 import { useGetTasksQuery } from "../redux/slices/taskApiSlice";
+import { useGetSettingsQuery } from "../redux/slices/settingsApiSlice";
+import { useSelector } from "react-redux";
 
 const TABS = [
   { title: "มุมมองกระดาน", icon: <MdGridView /> },
@@ -37,6 +39,10 @@ const mapStageToUI = (stage) => {
 const Tasks = () => {
   const params = useParams();
   const { data: tasksData, isLoading } = useGetTasksQuery();
+  const { data: settings } = useGetSettingsQuery();
+  const { user } = useSelector((state) => state.auth);
+
+  const canCreateTask = user?.role === "ADMIN" || settings?.data?.allowUsersCreateTasks === "true" || settings?.data?.allowUsersCreateTasks === true;
 
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
@@ -70,7 +76,7 @@ const Tasks = () => {
       <div className='flex items-center justify-between mb-4'>
         <Title title={status ? `งานสถานะ: ${TASK_TYPE_THAI[status] || status}` : "งานทั้งหมด"} />
 
-        {!status && (
+        {!status && canCreateTask && (
           <Button
             onClick={() => {
               setInitialStage(null);
@@ -89,17 +95,17 @@ const Tasks = () => {
             <TaskTitle
               label='สิ่งที่ต้องทำ'
               className={TASK_TYPE.todo}
-              onClick={() => handleAddTaskClick("สิ่งที่ต้องทำ")}
+              onClick={canCreateTask ? () => handleAddTaskClick("สิ่งที่ต้องทำ") : undefined}
             />
             <TaskTitle
               label='กำลังดำเนินการ'
               className={TASK_TYPE["in progress"]}
-              onClick={() => handleAddTaskClick("กำลังดำเนินการ")}
+              onClick={canCreateTask ? () => handleAddTaskClick("กำลังดำเนินการ") : undefined}
             />
             <TaskTitle
               label='เสร็จสิ้น'
               className={TASK_TYPE.completed}
-              onClick={() => handleAddTaskClick("เสร็จสิ้น")}
+              onClick={canCreateTask ? () => handleAddTaskClick("เสร็จสิ้น") : undefined}
             />
           </div>
         )}

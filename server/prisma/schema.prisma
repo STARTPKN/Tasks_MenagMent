@@ -78,3 +78,12 @@ model Notification {
   taskId String
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

@@ -41,7 +41,7 @@ export const tasksController = {
 
   trashTask: async (req, res, next) => {
     try {
-      await tasksService.trashTask(req.params.id);
+      await tasksService.trashTask(req.params.id, req.user);
       apiSuccess(res, "Task moved to trash successfully", null);
     } catch (error) {
       next(error);

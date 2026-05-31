@@ -6,7 +6,9 @@ import Button from "../components/Button";
 import { useDispatch, useSelector } from "react-redux";
 import { useRegisterMutation } from "../redux/slices/authApiSlice";
 import { setCredentials } from "../redux/slices/authSlice";
+import { useGetSettingsQuery } from "../redux/slices/settingsApiSlice";
 import { toast } from "sonner";
+import Loader from "../components/Loader";
 
 const Register = () => {
   const { user } = useSelector((state) => state.auth);
@@ -20,6 +22,7 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [registerUser, { isLoading }] = useRegisterMutation();
+  const { data: settings, isLoading: isLoadingSettings } = useGetSettingsQuery();
 
   const password = watch("password");
 
@@ -75,110 +78,131 @@ const Register = () => {
 
         {/* Right Side - Register Form */}
         <div className='w-full md:w-1/3 p-4 md:p-1 flex flex-col justify-center items-center'>
-          <form
-            onSubmit={handleSubmit(submitHandler)}
-            className='form-container w-full md:w-[400px] flex flex-col gap-y-5 bg-white px-10 pt-10 pb-10'
-          >
-            <div>
-              <p className='text-blue-600 text-3xl font-bold text-center'>
-                สร้างบัญชีใหม่
-              </p>
-              <p className='text-center text-base text-gray-700 mt-1'>
-                ลงทะเบียนเข้าใช้งานระบบเพื่อเริ่มต้นจัดการงาน
-              </p>
+          {isLoadingSettings ? (
+            <div className='w-full h-[400px] flex items-center justify-center bg-white px-10 pt-10 pb-10'>
+              <Loader />
             </div>
-
-            <div className='flex flex-col gap-y-4'>
-              <Textbox
-                placeholder='ชื่อ-นามสกุลของคุณ'
-                type='text'
-                name='name'
-                label='ชื่อ-นามสกุล'
-                className='w-full rounded-full'
-                register={register("name", {
-                  required: "กรุณากรอกชื่อ-นามสกุล!",
-                })}
-                error={errors.name ? errors.name.message : ""}
-              />
-
-              <Textbox
-                placeholder='email@example.com'
-                type='email'
-                name='email'
-                label='Email Address'
-                className='w-full rounded-full'
-                register={register("email", {
-                  required: "กรุณากรอกอีเมล!",
-                  pattern: {
-                    value: /^\S+@\S+$/i,
-                    message: "รูปแบบอีเมลไม่ถูกต้อง",
-                  },
-                })}
-                error={errors.email ? errors.email.message : ""}
-              />
-
-              <Textbox
-                placeholder='เช่น Developer, Designer, Manager'
-                type='text'
-                name='title'
-                label='ตำแหน่งงาน (Title)'
-                className='w-full rounded-full'
-                register={register("title", {
-                  required: "กรุณากรอกตำแหน่งงาน!",
-                })}
-                error={errors.title ? errors.title.message : ""}
-              />
-
-              <Textbox
-                placeholder='รหัสผ่านอย่างน้อย 6 ตัวอักษร'
-                type='password'
-                name='password'
-                label='Password'
-                className='w-full rounded-full'
-                register={register("password", {
-                  required: "กรุณากรอกรหัสผ่าน!",
-                  minLength: {
-                    value: 6,
-                    message: "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร",
-                  },
-                })}
-                error={errors.password ? errors.password.message : ""}
-              />
-
-              <Textbox
-                placeholder='ยืนยันรหัสผ่านอีกครั้ง'
-                type='password'
-                name='confirmPassword'
-                label='Confirm Password'
-                className='w-full rounded-full'
-                register={register("confirmPassword", {
-                  required: "กรุณายืนยันรหัสผ่าน!",
-                  validate: (value) =>
-                    value === password || "รหัสผ่านไม่ตรงกัน",
-                })}
-                error={errors.confirmPassword ? errors.confirmPassword.message : ""}
-              />
-
+          ) : settings?.data?.allowUserRegistration === "false" ? (
+            <div className='form-container w-full md:w-[400px] flex flex-col gap-y-5 bg-white px-10 pt-10 pb-10 text-center'>
+              <p className='text-red-600 text-3xl font-bold'>
+                ปิดการลงทะเบียน
+              </p>
+              <p className='text-base text-gray-700 mt-1'>
+                การสมัครสมาชิกถูกปิดใช้งานชั่วคราวโดยผู้ดูแลระบบ
+              </p>
               <Button
-                type='submit'
-                label={isLoading ? "กำลังสมัครสมาชิก..." : "Submit"}
-                className='w-full h-10 bg-blue-700 text-white rounded-full font-semibold shadow-md shadow-blue-600/10 transition-colors mt-2'
-                disabled={isLoading}
+                type='button'
+                label='กลับไปหน้าเข้าสู่ระบบ'
+                className='w-full h-10 bg-blue-700 text-white rounded-full font-semibold shadow-md shadow-blue-600/10 transition-colors mt-6'
+                onClick={() => navigate("/log-in")}
               />
-
-              <div className='text-center mt-2'>
-                <p className='text-sm text-gray-600'>
-                  มีบัญชีผู้ใช้อยู่แล้ว?{" "}
-                  <span
-                    className='text-blue-600 hover:text-blue-800 hover:underline cursor-pointer'
-                    onClick={() => navigate("/log-in")}
-                  >
-                    เข้าสู่ระบบที่นี่
-                  </span>
+            </div>
+          ) : (
+            <form
+              onSubmit={handleSubmit(submitHandler)}
+              className='form-container w-full md:w-[400px] flex flex-col gap-y-5 bg-white px-10 pt-10 pb-10'
+            >
+              <div>
+                <p className='text-blue-600 text-3xl font-bold text-center'>
+                  สร้างบัญชีใหม่
+                </p>
+                <p className='text-center text-base text-gray-700 mt-1'>
+                  ลงทะเบียนเข้าใช้งานระบบเพื่อเริ่มต้นจัดการงาน
                 </p>
               </div>
-            </div>
-          </form>
+
+              <div className='flex flex-col gap-y-4'>
+                <Textbox
+                  placeholder='ชื่อ-นามสกุลของคุณ'
+                  type='text'
+                  name='name'
+                  label='ชื่อ-นามสกุล'
+                  className='w-full rounded-full'
+                  register={register("name", {
+                    required: "กรุณากรอกชื่อ-นามสกุล!",
+                  })}
+                  error={errors.name ? errors.name.message : ""}
+                />
+
+                <Textbox
+                  placeholder='email@example.com'
+                  type='email'
+                  name='email'
+                  label='Email Address'
+                  className='w-full rounded-full'
+                  register={register("email", {
+                    required: "กรุณากรอกอีเมล!",
+                    pattern: {
+                      value: /^\S+@\S+$/i,
+                      message: "รูปแบบอีเมลไม่ถูกต้อง",
+                    },
+                  })}
+                  error={errors.email ? errors.email.message : ""}
+                />
+
+                <Textbox
+                  placeholder='เช่น Developer, Designer, Manager'
+                  type='text'
+                  name='title'
+                  label='ตำแหน่งงาน (Title)'
+                  className='w-full rounded-full'
+                  register={register("title", {
+                    required: "กรุณากรอกตำแหน่งงาน!",
+                  })}
+                  error={errors.title ? errors.title.message : ""}
+                />
+
+                <Textbox
+                  placeholder='รหัสผ่านอย่างน้อย 6 ตัวอักษร'
+                  type='password'
+                  name='password'
+                  label='Password'
+                  className='w-full rounded-full'
+                  register={register("password", {
+                    required: "กรุณากรอกรหัสผ่าน!",
+                    minLength: {
+                      value: 6,
+                      message: "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร",
+                    },
+                  })}
+                  error={errors.password ? errors.password.message : ""}
+                />
+
+                <Textbox
+                  placeholder='ยืนยันรหัสผ่านอีกครั้ง'
+                  type='password'
+                  name='confirmPassword'
+                  label='Confirm Password'
+                  className='w-full rounded-full'
+                  register={register("confirmPassword", {
+                    required: "กรุณายืนยันรหัสผ่าน!",
+                    validate: (value) =>
+                      value === password || "รหัสผ่านไม่ตรงกัน",
+                  })}
+                  error={errors.confirmPassword ? errors.confirmPassword.message : ""}
+                />
+
+                <Button
+                  type='submit'
+                  label={isLoading ? "กำลังสมัครสมาชิก..." : "Submit"}
+                  className='w-full h-10 bg-blue-700 text-white rounded-full font-semibold shadow-md shadow-blue-600/10 transition-colors mt-2'
+                  disabled={isLoading}
+                />
+
+                <div className='text-center mt-2'>
+                  <p className='text-sm text-gray-600'>
+                    มีบัญชีผู้ใช้อยู่แล้ว?{" "}
+                    <span
+                      className='text-blue-600 hover:text-blue-800 hover:underline cursor-pointer'
+                      onClick={() => navigate("/log-in")}
+                    >
+                      เข้าสู่ระบบที่นี่
+                    </span>
+                  </p>
+                </div>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>

@@ -100,12 +100,18 @@ const Sidebar = () => {
         ))}
       </div>
 
-      <div className='w-full border-t border-gray-100 pt-4'>
-        <button className='w-full flex gap-3 px-4 py-2.5 rounded-xl items-center text-base font-medium text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 transition-all duration-200'>
-          <MdSettings className='text-xl text-gray-500' />
-          <span>ตั้งค่า</span>
-        </button>
-      </div>
+      {user?.isAdmin && (
+        <div className='w-full border-t border-gray-100 pt-4'>
+          <Link
+            to='/settings'
+            onClick={closeSidebar}
+            className='w-full flex gap-3 px-4 py-2.5 rounded-xl items-center text-base font-medium text-gray-600 hover:bg-gray-100/80 hover:text-gray-900 transition-all duration-200'
+          >
+            <MdSettings className='text-xl text-gray-500' />
+            <span>ตั้งค่า</span>
+          </Link>
+        </div>
+      )}
     </div>
   );
 };

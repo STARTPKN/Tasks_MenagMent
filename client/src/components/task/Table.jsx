@@ -22,6 +22,10 @@ import Button from "../Button";
 import ConfirmatioDialog from "../Dialogs";
 import AddTask from "./AddTask";
 import { RiFileEditLine } from "react-icons/ri";
+import { useTrashTaskMutation } from "../../redux/slices/taskApiSlice";
+import { useGetSettingsQuery } from "../../redux/slices/settingsApiSlice";
+import { useSelector } from "react-redux";
+
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
   medium: <MdKeyboardArrowUp />,
@@ -34,17 +38,32 @@ const Table = ({ tasks }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
+  const { data: settings } = useGetSettingsQuery();
+  const { user } = useSelector((state) => state.auth);
+  const canEdit = user?.role === "ADMIN" || settings?.data?.allowUsersEditTasks === "true" || settings?.data?.allowUsersEditTasks === true;
+  const canDelete = user?.role === "ADMIN" || settings?.data?.allowUsersDeleteTasks === "true" || settings?.data?.allowUsersDeleteTasks === true;
+
   const editClick = (task) => {
     setSelectedTask(task);
     setOpenEdit(true);
   };
+
+  const [trashTask] = useTrashTaskMutation();
 
   const deleteClicks = (id) => {
     setSelected(id);
     setOpenDialog(true);
   };
 
-  const deleteHandler = () => {};
+  const deleteHandler = async () => {
+    try {
+      await trashTask(selected).unwrap();
+      toast.success("ย้ายงานลงถังขยะเรียบร้อยแล้ว");
+      setOpenDialog(false);
+    } catch (error) {
+      toast.error(error?.data?.message || "เกิดข้อผิดพลาดในการลบงาน");
+    }
+  };
 
   const TableHeader = () => (
     <thead className="w-full border-b border-gray-300">
@@ -123,21 +142,27 @@ const Table = ({ tasks }) => {
           </div>
         </td>
 
-        <td className="py-2 flex gap-2 md:gap-4 justify-end">
-          <Button
-            className="text-yellow-500 hover:text-yellow-600 sm:px-0 text-sm md:text-base"
-            label="แก้ไข"
-            type="button"
-            onClick={() => editClick(task)}
-          />
+        {(canEdit || canDelete) && (
+          <td className="py-2 flex gap-2 md:gap-4 justify-end">
+            {canEdit && (
+              <Button
+                className="text-yellow-500 hover:text-yellow-600 sm:px-0 text-sm md:text-base"
+                label="แก้ไข"
+                type="button"
+                onClick={() => editClick(task)}
+              />
+            )}
 
-          <Button
-            className="text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base"
-            label="ลบ"
-            type="button"
-            onClick={() => deleteClicks(task._id)}
-          />
-        </td>
+            {canDelete && (
+              <Button
+                className="text-red-700 hover:text-red-500 sm:px-0 text-sm md:text-base"
+                label="ลบ"
+                type="button"
+                onClick={() => deleteClicks(task._id)}
+              />
+            )}
+          </td>
+        )}
       </tr>
     );
   };

@@ -17,7 +17,7 @@ export const updateTaskSchema = z.object({
   stage: z.enum(["TODO", "IN_PROGRESS", "COMPLETED"]).optional(),
   team: z.array(z.string()).optional(),
   assets: z.array(z.string()).optional(),
-});
+}).passthrough();
 
 export const createSubTaskSchema = z.object({
   title: z.string().min(1, "Title is required"),

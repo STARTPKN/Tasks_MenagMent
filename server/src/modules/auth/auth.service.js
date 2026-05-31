@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import { generateToken, AppError } from "../../utils/index.js";
 import authRepository from "./auth.repository.js";
+import settingsService from "../settings/settings.service.js";
 
 export const authService = {
   login: async (email, password) => {
@@ -26,7 +27,12 @@ export const authService = {
     return { user: userWithoutPassword, token };
   },
 
-  register: async (name, email, password, title = "Member") => {
+  register: async (name, email, password) => {
+    const allowRegistration = await settingsService.getSetting("allowUserRegistration");
+    if (allowRegistration !== "true") {
+      throw new AppError("การสมัครสมาชิกถูกปิดใช้งานโดยผู้ดูแลระบบ", 403);
+    }
+
     const existingUser = await authRepository.findByEmail(email);
     if (existingUser) {
       throw new AppError("Email already registered", 400);
@@ -35,12 +41,15 @@ export const authService = {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const defaultTitle = await settingsService.getSetting("defaultUserTitle");
+    const defaultRole = await settingsService.getSetting("defaultUserRole");
+
     const user = await authRepository.createUser({
       name,
       email,
       password: hashedPassword,
-      title,
-      role: "USER",
+      title: defaultTitle,
+      role: defaultRole,
       isActive: true,
     });
 
