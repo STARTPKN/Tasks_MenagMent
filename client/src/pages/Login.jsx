@@ -48,10 +48,10 @@ const Login = () => {
         <div className="h-full w-full lg:w-2/3 flex flex-col items-center justify-center">
           <div className="w-full md:max-w-lg 2xl:max-w-3xl flex flex-col items-center justify-center gap-5 md:gap-y-10 2xl:-mt-20">
             <span className="flex gap-1 py-1 px-3 border rounded-full text-sm md:text-base bordergray-300 text-gray-600">
-              Manage all your task in one place!
+              จัดการงานของคุณอย่างเป็นระบบ !
             </span>
             <p className="flex flex-col gap-0 md:gap-4 text-4xl md:text-6xl 2xl:text-7xl font-black text-center text-blue-700">
-              <span>Cloud-Based</span>
+              
               <span>Task Manager</span>
             </p>
 
@@ -69,10 +69,10 @@ const Login = () => {
           >
             <div className="">
               <p className="text-blue-600 text-3xl font-bold text-center">
-                Welcome back!
+                ยินดีต้อนรับ!
               </p>
               <p className="text-center text-base text-gray-700 ">
-                Keep all your credential safge.
+                จัดการข้อมูลประจำตัวของคุณอย่างปลอดภัย
               </p>
             </div>
 
@@ -101,7 +101,7 @@ const Login = () => {
               />
 
               <span className="text-sm text-gray-500 hover:text-blue-600 hover:underline cursor-pointer">
-                Forget Password?
+                ลืมรหัสผ่าน?
               </span>
 
               <Button
@@ -110,6 +110,17 @@ const Login = () => {
                 className="w-full h-10 bg-blue-700 text-white rounded-full"
                 disabled={isLoading}
               />
+              <div>
+                <p className="text-sm text-gray-600">
+                  ถ้ายังไม่มีบัญชีผู้ใช้{" "}
+                  <span
+                    className="text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                    onClick={() => navigate("/register")}
+                  >
+                    สมัครสมาชิกที่นี่
+                  </span>
+                </p>
+              </div>
             </div>
           </form>
         </div>

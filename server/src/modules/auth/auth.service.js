@@ -26,6 +26,28 @@ export const authService = {
     return { user: userWithoutPassword, token };
   },
 
+  register: async (name, email, password, title = "Member") => {
+    const existingUser = await authRepository.findByEmail(email);
+    if (existingUser) {
+      throw new AppError("Email already registered", 400);
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const user = await authRepository.createUser({
+      name,
+      email,
+      password: hashedPassword,
+      title,
+      role: "USER",
+      isActive: true,
+    });
+
+    const token = generateToken(user.id);
+    return { user, token };
+  },
+
   getProfile: async (userId) => {
     const user = await authRepository.findById(userId);
 

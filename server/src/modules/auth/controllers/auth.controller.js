@@ -12,6 +12,16 @@ export const authController = {
     }
   },
 
+  register: async (req, res, next) => {
+    try {
+      const { name, email, password, title } = req.body;
+      const result = await authService.register(name, email, password, title);
+      apiSuccess(res, "Registration successful", result, 201);
+    } catch (error) {
+      next(error);
+    }
+  },
+
   getProfile: async (req, res, next) => {
     try {
       const user = await authService.getProfile(req.user.id);

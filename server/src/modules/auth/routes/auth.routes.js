@@ -1,12 +1,13 @@
 import { Router } from "express";
 import authController from "../controllers/auth.controller.js";
 import { protect } from "../../../middleware/auth.middleware.js";
-import { validate, loginSchema, changePasswordSchema } from "../auth.validation.js";
+import { validate, loginSchema, registerSchema, changePasswordSchema } from "../auth.validation.js";
 
 const router = Router();
 
 // Public routes
 router.post("/login", validate(loginSchema), authController.login);
+router.post("/register", validate(registerSchema), authController.register);
 
 // Protected routes
 router.get("/profile", protect, authController.getProfile);

@@ -15,7 +15,7 @@ const Users = lazy(() => import("./pages/Users"));
 const Trash = lazy(() => import("./pages/Trash"));
 const TaskDetails = lazy(() => import("./pages/TaskDetails"));
 const Login = lazy(() => import("./pages/Login"));
-
+const Register = lazy(() => import("./pages/Register"));
 function App() {
   return (
     <main className='w-full min-h-screen bg-[#f3f4f6] '>
@@ -40,6 +40,7 @@ function App() {
           </Route>
 
           <Route path='/log-in' element={<Login />} />
+          <Route path='/register' element={<Register />} />
         </Routes>
       </Suspense>
 
