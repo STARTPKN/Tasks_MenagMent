@@ -9,6 +9,7 @@ import { IoMdAdd } from "react-icons/io";
 import Tabs from "../components/Tabs";
 import TaskTitle from "../components/TaskTitle";
 import BoardView from "../components/BoardView";
+import KanbanBoardView from "../components/KanbanBoardView";
 import Table from "../components/task/Table";
 import AddTask from "../components/task/AddTask";
 import { TASK_TYPE_THAI } from "../utils";
@@ -16,9 +17,12 @@ import { useGetTasksQuery } from "../redux/slices/taskApiSlice";
 import { useGetSettingsQuery } from "../redux/slices/settingsApiSlice";
 import { useSelector } from "react-redux";
 
+import { BsKanban } from "react-icons/bs";
+
 const TABS = [
   { title: "มุมมองกระดาน", icon: <MdGridView /> },
   { title: "มุมมองรายการ", icon: <FaList /> },
+  { title: "คัมบังบอร์ด", icon: <BsKanban /> },
 ];
 
 const TASK_TYPE = {
@@ -90,7 +94,8 @@ const Tasks = () => {
       </div>
 
       <Tabs tabs={TABS} setSelected={setSelected}>
-        {!status && (
+        <>
+        {!status && selected !== 2 && (
           <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4'>
             <TaskTitle
               label='สิ่งที่ต้องทำ'
@@ -110,13 +115,20 @@ const Tasks = () => {
           </div>
         )}
 
-        {selected !== 1 ? (
-          <BoardView tasks={filteredTasks} />
-        ) : (
+        {selected === 0 && <BoardView tasks={filteredTasks} />}
+        {selected === 1 && (
           <div className='w-full'>
             <Table tasks={filteredTasks} />
           </div>
         )}
+        {selected === 2 && (
+          <KanbanBoardView
+            tasks={filteredTasks}
+            canCreateTask={canCreateTask}
+            onAddTask={handleAddTaskClick}
+          />
+        )}
+        </>
       </Tabs>
 
       <AddTask
