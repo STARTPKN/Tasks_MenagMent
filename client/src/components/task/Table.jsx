@@ -13,7 +13,8 @@ import { FaList } from "react-icons/fa";
 import UserInfo from "../UserInfo";
 import Button from "../Button";
 import ConfirmatioDialog from "../Dialogs";
-
+import AddTask from "./AddTask";
+import { RiFileEditLine } from "react-icons/ri";
 const ICONS = {
   high: <MdKeyboardDoubleArrowUp />,
   medium: <MdKeyboardArrowUp />,
@@ -23,6 +24,13 @@ const ICONS = {
 const Table = ({ tasks }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+
+  const editClick = (task) => {
+    setSelectedTask(task);
+    setOpenEdit(true);
+  };
 
   const deleteClicks = (id) => {
     setSelected(id);
@@ -108,9 +116,10 @@ const Table = ({ tasks }) => {
 
       <td className='py-2 flex gap-2 md:gap-4 justify-end'>
         <Button
-          className='text-blue-600 hover:text-blue-500 sm:px-0 text-sm md:text-base'
-          label='แก้ไข'
+          className='text-yellow-500 hover:text-yellow-600 sm:px-0 text-sm md:text-base'
+          label="แก้ไข"
           type='button'
+          onClick={() => editClick(task)}
         />
 
         <Button
@@ -143,8 +152,16 @@ const Table = ({ tasks }) => {
         setOpen={setOpenDialog}
         onClick={deleteHandler}
       />
+
+      <AddTask
+        open={openEdit}
+        setOpen={setOpenEdit}
+        task={selectedTask}
+        key={selectedTask ? selectedTask._id : "new"}
+      />
     </>
   );
 };
 
 export default Table;
+

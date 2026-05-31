@@ -47,7 +47,7 @@ const mapPriorityToThai = (priority) => {
   return PRIORIRY[2];
 };
 
-const AddTask = ({ open, setOpen, task = null }) => {
+const AddTask = ({ open, setOpen, task = null, initialStage = null }) => {
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
   const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
 
@@ -63,7 +63,7 @@ const AddTask = ({ open, setOpen, task = null }) => {
     },
   });
   const [team, setTeam] = useState(task?.team || []);
-  const [stage, setStage] = useState(mapStageToThai(task?.stage));
+  const [stage, setStage] = useState(initialStage || mapStageToThai(task?.stage));
   const [priority, setPriority] = useState(mapPriorityToThai(task?.priority));
   const [assets, setAssets] = useState([]);
   const [uploading, setUploading] = useState(false);
@@ -121,9 +121,9 @@ const AddTask = ({ open, setOpen, task = null }) => {
       date: task?.date ? task.date.split("T")[0] : "",
     });
     setTeam(task?.team || []);
-    setStage(mapStageToThai(task?.stage));
+    setStage(task ? mapStageToThai(task?.stage) : (initialStage || LISTS[0]));
     setPriority(mapPriorityToThai(task?.priority));
-  }, [task, open, reset]);
+  }, [task, open, reset, initialStage]);
 
   const handleSelect = (e) => {
     const newFiles = Array.from(e.target.files || []);

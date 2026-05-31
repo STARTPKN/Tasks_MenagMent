@@ -150,6 +150,25 @@ export const tasksRepository = {
     });
   },
 
+  findSubTaskById: async (id) => {
+    return prisma.subTask.findUnique({
+      where: { id },
+    });
+  },
+
+  updateSubTask: async (id, data) => {
+    return prisma.subTask.update({
+      where: { id },
+      data,
+    });
+  },
+
+  deleteSubTask: async (id) => {
+    return prisma.subTask.delete({
+      where: { id },
+    });
+  },
+
   // Activities
   createActivity: async (taskId, userId, data) => {
     return prisma.activity.create({

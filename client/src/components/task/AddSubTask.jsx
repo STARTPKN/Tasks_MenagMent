@@ -1,24 +1,48 @@
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import ModalWrapper from "../ModalWrapper";
 import { Dialog } from "@headlessui/react";
 import Textbox from "../Textbox";
 import Button from "../Button";
-import { useAddSubTaskMutation } from "../../redux/slices/taskApiSlice";
+import { useAddSubTaskMutation, useUpdateSubTaskMutation } from "../../redux/slices/taskApiSlice";
 import { toast } from "sonner";
 
-const AddSubTask = ({ open, setOpen, id }) => {
+const AddSubTask = ({ open, setOpen, id, subTask = null }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+    reset,
+  } = useForm({
+    defaultValues: {
+      title: subTask?.title || "",
+      date: subTask?.date ? subTask.date.split("T")[0] : "",
+      tag: subTask?.tag || "",
+    },
+  });
 
-  const [addSubTask, { isLoading }] = useAddSubTaskMutation();
+  const [addSubTask, { isLoading: isAdding }] = useAddSubTaskMutation();
+  const [updateSubTask, { isLoading: isUpdating }] = useUpdateSubTaskMutation();
+
+  const isLoading = isAdding || isUpdating;
+
+  useEffect(() => {
+    reset({
+      title: subTask?.title || "",
+      date: subTask?.date ? subTask.date.split("T")[0] : "",
+      tag: subTask?.tag || "",
+    });
+  }, [subTask, open, reset]);
 
   const handleOnSubmit = async (data) => {
     try {
-      await addSubTask({ id, data }).unwrap();
-      toast.success("เพิ่มงานย่อยสำเร็จ!");
+      if (subTask) {
+        await updateSubTask({ subTaskId: subTask.id || subTask._id, data }).unwrap();
+        toast.success("แก้ไขงานย่อยสำเร็จ!");
+      } else {
+        await addSubTask({ id, data }).unwrap();
+        toast.success("เพิ่มงานย่อยสำเร็จ!");
+      }
       setOpen(false);
     } catch (err) {
       toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาด");
@@ -33,7 +57,7 @@ const AddSubTask = ({ open, setOpen, id }) => {
             as='h2'
             className='text-base font-bold leading-6 text-gray-900 mb-4'
           >
-            เพิ่มงานย่อย
+            {subTask ? "แก้ไขงานย่อย" : "เพิ่มงานย่อย"}
           </Dialog.Title>
           <div className='mt-2 flex flex-col gap-6'>
             <Textbox
@@ -77,7 +101,7 @@ const AddSubTask = ({ open, setOpen, id }) => {
             <Button
               type='submit'
               className='bg-blue-600 text-sm font-semibold text-white hover:bg-blue-700 sm:ml-3 sm:w-auto'
-              label={isLoading ? "กำลังเพิ่ม..." : "เพิ่มงาน"}
+              label={isLoading ? (subTask ? "กำลังบันทึก..." : "กำลังเพิ่ม...") : (subTask ? "บันทึก" : "เพิ่มงาน")}
             />
 
             <Button
@@ -94,3 +118,4 @@ const AddSubTask = ({ open, setOpen, id }) => {
 };
 
 export default AddSubTask;
+

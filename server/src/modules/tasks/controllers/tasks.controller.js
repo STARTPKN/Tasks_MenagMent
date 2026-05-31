@@ -102,6 +102,25 @@ export const tasksController = {
     }
   },
 
+  updateSubTask: async (req, res, next) => {
+    try {
+      const subTask = await tasksService.updateSubTask(req.params.subTaskId, req.body);
+      apiSuccess(res, "Sub-task updated successfully", subTask);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  deleteSubTask: async (req, res, next) => {
+    try {
+      await tasksService.deleteSubTask(req.params.subTaskId);
+      apiSuccess(res, "Sub-task deleted successfully", null);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+
   createActivity: async (req, res, next) => {
     try {
       const activity = await tasksService.createActivity(

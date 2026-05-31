@@ -41,6 +41,18 @@ router.post(
   validate(createSubTaskSchema),
   tasksController.createSubTask
 );
+router.put(
+  "/subtasks/:subTaskId",
+  isAdmin,
+  validate(createSubTaskSchema),
+  tasksController.updateSubTask
+);
+router.delete(
+  "/subtasks/:subTaskId",
+  isAdmin,
+  tasksController.deleteSubTask
+);
+
 
 // Activities
 router.post(

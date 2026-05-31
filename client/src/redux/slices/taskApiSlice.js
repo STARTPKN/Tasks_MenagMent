@@ -50,6 +50,29 @@ export const taskApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Tasks"],
     }),
+    postTaskActivity: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/tasks/${id}/activities`,
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+    updateSubTask: builder.mutation({
+      query: ({ subTaskId, data }) => ({
+        url: `/tasks/subtasks/${subTaskId}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+    deleteSubTask: builder.mutation({
+      query: (subTaskId) => ({
+        url: `/tasks/subtasks/${subTaskId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
   }),
 });
 
@@ -60,4 +83,8 @@ export const {
   useDeleteTaskMutation,
   useGetDashboardStatsQuery,
   useAddSubTaskMutation,
+  usePostTaskActivityMutation,
+  useUpdateSubTaskMutation,
+  useDeleteSubTaskMutation,
 } = taskApiSlice;
+

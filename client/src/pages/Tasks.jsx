@@ -40,8 +40,14 @@ const Tasks = () => {
 
   const [selected, setSelected] = useState(0);
   const [open, setOpen] = useState(false);
+  const [initialStage, setInitialStage] = useState(null);
 
   const status = params?.status || "";
+
+  const handleAddTaskClick = (stageName) => {
+    setInitialStage(stageName);
+    setOpen(true);
+  };
 
   // Normalize tasks from DB: map stage to lowercase UI format
   const allTasks = (tasksData?.data || []).map((task) => ({
@@ -66,7 +72,10 @@ const Tasks = () => {
 
         {!status && (
           <Button
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              setInitialStage(null);
+              setOpen(true);
+            }}
             label='สร้างงาน'
             icon={<IoMdAdd className='text-lg' />}
             className='flex flex-row-reverse gap-1 items-center bg-blue-600 text-white rounded-md py-2 2xl:py-2.5'
@@ -77,12 +86,21 @@ const Tasks = () => {
       <Tabs tabs={TABS} setSelected={setSelected}>
         {!status && (
           <div className='w-full flex justify-between gap-4 md:gap-x-12 py-4'>
-            <TaskTitle label='สิ่งที่ต้องทำ' className={TASK_TYPE.todo} />
+            <TaskTitle
+              label='สิ่งที่ต้องทำ'
+              className={TASK_TYPE.todo}
+              onClick={() => handleAddTaskClick("สิ่งที่ต้องทำ")}
+            />
             <TaskTitle
               label='กำลังดำเนินการ'
               className={TASK_TYPE["in progress"]}
+              onClick={() => handleAddTaskClick("กำลังดำเนินการ")}
             />
-            <TaskTitle label='เสร็จสิ้น' className={TASK_TYPE.completed} />
+            <TaskTitle
+              label='เสร็จสิ้น'
+              className={TASK_TYPE.completed}
+              onClick={() => handleAddTaskClick("เสร็จสิ้น")}
+            />
           </div>
         )}
 
@@ -95,7 +113,12 @@ const Tasks = () => {
         )}
       </Tabs>
 
-      <AddTask open={open} setOpen={setOpen} />
+      <AddTask
+        open={open}
+        setOpen={setOpen}
+        initialStage={initialStage}
+        key={open ? (initialStage || "generic") : "closed"}
+      />
     </div>
   );
 };

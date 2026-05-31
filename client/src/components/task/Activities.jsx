@@ -5,6 +5,8 @@ import { GrInProgress } from "react-icons/gr";
 import { MdOutlineDoneAll, MdOutlineMessage } from "react-icons/md";
 import Loading from "../Loader";
 import Button from "../Button";
+import { toast } from "sonner";
+import { usePostTaskActivityMutation } from "../../redux/slices/taskApiSlice";
 
 const TASKTYPEICON = {
   commented: (
@@ -37,6 +39,11 @@ const TASKTYPEICON = {
       <GrInProgress size={16} />
     </div>
   ),
+  in_progress: (
+    <div className='w-8 h-8 flex items-center justify-center rounded-full bg-violet-600 text-white'>
+      <GrInProgress size={16} />
+    </div>
+  ),
 };
 
 const act_types = [
@@ -52,17 +59,47 @@ const ACT_TYPES_THAI = {
   started: "เริ่มแล้ว",
   completed: "เสร็จสิ้น",
   "in progress": "กำลังดำเนินการ",
+  in_progress: "กำลังดำเนินการ",
   commented: "แสดงความคิดเห็น",
   bug: "พบบั๊ก",
   assigned: "มอบหมาย",
 };
 
+const MAP_THAI_TO_ENG = {
+  "เริ่มแล้ว": "started",
+  "เสร็จสิ้น": "completed",
+  "กำลังดำเนินการ": "in_progress",
+  "แสดงความคิดเห็น": "commented",
+  "พบบั๊ก": "bug",
+  "มอบหมาย": "assigned",
+};
+
 const Activities = ({ activity, id }) => {
   const [selected, setSelected] = useState(act_types[0]);
   const [text, setText] = useState("");
-  const isLoading = false;
+  const [postActivity, { isLoading }] = usePostTaskActivityMutation();
 
-  const handleSubmit = async () => {};
+  const handleSubmit = async () => {
+    if (!text.trim()) {
+      toast.error("กรุณากรอกข้อความกิจกรรม");
+      return;
+    }
+    try {
+      const type = MAP_THAI_TO_ENG[selected];
+      await postActivity({
+        id,
+        data: {
+          type,
+          activity: text,
+        },
+      }).unwrap();
+
+      toast.success("เพิ่มกิจกรรมสำเร็จ!");
+      setText("");
+    } catch (err) {
+      toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาดในการเพิ่มกิจกรรม");
+    }
+  };
 
   const Card = ({ item }) => {
     return (

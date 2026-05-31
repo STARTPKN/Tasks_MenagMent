@@ -105,6 +105,33 @@ export const tasksService = {
     return tasksRepository.createSubTask(taskId, subTaskData);
   },
 
+  updateSubTask: async (subTaskId, data) => {
+    const subTask = await tasksRepository.findSubTaskById(subTaskId);
+    if (!subTask) {
+      throw new AppError("Sub-task not found", 404);
+    }
+
+    const subTaskData = {
+      title: data.title,
+      tag: data.tag,
+    };
+
+    if (data.date) {
+      subTaskData.date = new Date(data.date);
+    }
+
+    return tasksRepository.updateSubTask(subTaskId, subTaskData);
+  },
+
+  deleteSubTask: async (subTaskId) => {
+    const subTask = await tasksRepository.findSubTaskById(subTaskId);
+    if (!subTask) {
+      throw new AppError("Sub-task not found", 404);
+    }
+
+    return tasksRepository.deleteSubTask(subTaskId);
+  },
+
   createActivity: async (taskId, userId, data) => {
     const task = await tasksRepository.findById(taskId);
     if (!task) {
