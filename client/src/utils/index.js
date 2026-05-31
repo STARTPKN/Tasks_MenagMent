@@ -81,3 +81,18 @@ export const formatThaiDate = (dateStr) => {
   });
 };
 
+export const formatThaiDateTime = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
+  const formatted = date.toLocaleDateString("th-TH", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+  return `${formatted.replace(",", "")} น.`;
+};
+

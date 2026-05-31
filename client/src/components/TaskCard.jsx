@@ -7,7 +7,7 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { useSelector } from "react-redux";
-import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate, PRIORITY_THAI } from "../utils";
+import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate, PRIORITY_THAI, formatThaiDateTime } from "../utils";
 import TaskDialog from "./task/TaskDialog";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
@@ -25,6 +25,9 @@ const TaskCard = ({ task }) => {
   const { user } = useSelector((state) => state.auth);
   const [open, setOpen] = useState(false);
 
+  const priority = task?.priority?.toLowerCase();
+  const stage = task?.stage?.toLowerCase()?.replace("_", " ");
+
   return (
     <>
       <div className='w-full h-fit bg-white shadow-md p-4 rounded'>
@@ -32,25 +35,25 @@ const TaskCard = ({ task }) => {
           <div
             className={clsx(
               "flex flex-1 gap-1 items-center text-sm font-medium",
-              PRIOTITYSTYELS[task?.priority]
+              PRIOTITYSTYELS[priority]
             )}
           >
-            <span className='text-lg'>{ICONS[task?.priority]}</span>
-            <span className='uppercase'>ความสำคัญ {PRIORITY_THAI[task?.priority] || task?.priority}</span>
+            <span className='text-lg'>{ICONS[priority]}</span>
+            <span className='uppercase'>ความสำคัญ {PRIORITY_THAI[priority] || task?.priority}</span>
           </div>
 
-          {user?.isAdmin && <TaskDialog task={task} />}
+          <TaskDialog task={task} />
         </div>
 
         <>
           <div className='flex items-center gap-2'>
             <div
-              className={clsx("w-4 h-4 rounded-full", TASK_TYPE[task.stage])}
+              className={clsx("w-4 h-4 rounded-full", TASK_TYPE[stage])}
             />
             <h4 className='line-clamp-1 text-black'>{task?.title}</h4>
           </div>
           <span className='text-sm text-gray-600'>
-            {formatDate(new Date(task?.date))}
+            {formatThaiDateTime(task?.date)}
           </span>
         </>
 
@@ -113,8 +116,7 @@ const TaskCard = ({ task }) => {
         <div className='w-full pb-2'>
           <button
             onClick={() => setOpen(true)}
-            disabled={user.isAdmin ? false : true}
-            className='w-full flex gap-4 items-center text-sm text-gray-500 font-semibold disabled:cursor-not-allowed disabled::text-gray-300'
+            className='w-full flex gap-4 items-center text-sm text-gray-500 font-semibold active:scale-95 transition-all'
           >
             <IoMdAdd className='text-lg' />
             <span>เพิ่มงานย่อย</span>

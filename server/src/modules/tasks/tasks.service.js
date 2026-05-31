@@ -1,5 +1,6 @@
 import { AppError } from "../../utils/index.js";
 import tasksRepository from "./tasks.repository.js";
+import notificationsService from "../notifications/notifications.service.js";
 
 export const tasksService = {
   getAllTasks: async (stage) => {
@@ -18,7 +19,7 @@ export const tasksService = {
     return task;
   },
 
-  createTask: async (data) => {
+  createTask: async (data, currentUser) => {
     const taskData = {
       title: data.title,
       priority: data.priority || "NORMAL",
@@ -31,10 +32,22 @@ export const tasksService = {
       taskData.date = new Date(data.date);
     }
 
-    return tasksRepository.create(taskData);
+    const task = await tasksRepository.create(taskData);
+
+    // สร้างแจ้งเตือนให้ team members ทุกคน
+    if (currentUser && data.team && data.team.length > 0) {
+      const recipientIds = data.team.filter((id) => id !== currentUser.id);
+      await notificationsService.createTaskAssignedNotifications(
+        task,
+        recipientIds,
+        currentUser.name
+      );
+    }
+
+    return task;
   },
 
-  updateTask: async (id, data) => {
+  updateTask: async (id, data, currentUser) => {
     const task = await tasksRepository.findById(id);
     if (!task) {
       throw new AppError("Task not found", 404);
@@ -48,7 +61,24 @@ export const tasksService = {
     if (data.team) updateData.team = data.team;
     if (data.assets) updateData.assets = data.assets;
 
-    return tasksRepository.update(id, updateData);
+    const updatedTask = await tasksRepository.update(id, updateData);
+
+    // ตรวจหา team members ใหม่ที่ถูกเพิ่มเข้ามา → แจ้งเตือน
+    if (currentUser && data.team) {
+      const oldTeamIds = task.team.map((m) => m.id);
+      const newMembers = data.team.filter(
+        (userId) => !oldTeamIds.includes(userId) && userId !== currentUser.id
+      );
+      if (newMembers.length > 0) {
+        await notificationsService.createTaskAssignedNotifications(
+          updatedTask,
+          newMembers,
+          currentUser.name
+        );
+      }
+    }
+
+    return updatedTask;
   },
 
   trashTask: async (id) => {
@@ -132,16 +162,28 @@ export const tasksService = {
     return tasksRepository.deleteSubTask(subTaskId);
   },
 
-  createActivity: async (taskId, userId, data) => {
+  createActivity: async (taskId, userId, data, currentUser) => {
     const task = await tasksRepository.findById(taskId);
     if (!task) {
       throw new AppError("Task not found", 404);
     }
 
-    return tasksRepository.createActivity(taskId, userId, {
+    const activity = await tasksRepository.createActivity(taskId, userId, {
       type: data.type,
       activity: data.activity,
     });
+
+    // สร้างแจ้งเตือนให้ team members ทุกคน ยกเว้นผู้สร้าง activity
+    if (currentUser) {
+      await notificationsService.createActivityNotifications(
+        task,
+        activity,
+        currentUser.id,
+        currentUser.name
+      );
+    }
+
+    return activity;
   },
 
   getDashboard: async () => {
@@ -155,9 +197,11 @@ export const tasksService = {
         "in progress": stats.inProgress,
         completed: stats.completed,
       },
+      priorities: stats.priorities,
       last10Task: recentTasks.slice(0, 10),
     };
   },
 };
 
 export default tasksService;
+

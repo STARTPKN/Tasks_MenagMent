@@ -8,32 +8,34 @@ generator client {
 }
 
 model User {
-  id         String     @id @default(uuid())
-  email      String     @unique
-  name       String
-  password   String
-  role       String     @default("USER") // ADMIN, USER
-  title      String     @default("Member")
-  isActive   Boolean    @default(true)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  tasks      Task[]     @relation("TaskTeam")
-  activities Activity[]
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  password      String
+  role          String         @default("USER") // ADMIN, USER
+  title         String         @default("Member")
+  isActive      Boolean        @default(true)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  tasks         Task[]         @relation("TaskTeam")
+  activities    Activity[]
+  notifications Notification[]
 }
 
 model Task {
-  id         String     @id @default(uuid())
-  title      String
-  date       DateTime   @default(now())
-  priority   String     @default("NORMAL") // HIGH, MEDIUM, NORMAL, LOW
-  stage      String     @default("TODO") // TODO, IN_PROGRESS, COMPLETED
-  isTrashed  Boolean    @default(false)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  team       User[]     @relation("TaskTeam")
-  subTasks   SubTask[]
-  activities Activity[]
-  assets     Asset[]
+  id            String         @id @default(uuid())
+  title         String
+  date          DateTime       @default(now())
+  priority      String         @default("NORMAL") // HIGH, MEDIUM, NORMAL, LOW
+  stage         String         @default("TODO") // TODO, IN_PROGRESS, COMPLETED
+  isTrashed     Boolean        @default(false)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  team          User[]         @relation("TaskTeam")
+  subTasks      SubTask[]
+  activities    Activity[]
+  assets        Asset[]
+  notifications Notification[]
 }
 
 model SubTask {
@@ -59,6 +61,20 @@ model Activity {
 model Asset {
   id     String @id @default(uuid())
   url    String
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  type      String   // "assigned" | "activity"
+  text      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   taskId String
   task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 }

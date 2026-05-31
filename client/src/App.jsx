@@ -3,6 +3,10 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { Toaster } from "sonner";
 import Layout from "./components/Layout";
 import Loader from "./components/Loader";
+import moment from "moment";
+import "moment/locale/th";
+
+moment.locale("th");
 
 // Lazy load pages for Code Splitting
 const Dashboard = lazy(() => import("./pages/dashboard"));

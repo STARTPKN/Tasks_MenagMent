@@ -187,14 +187,24 @@ export const tasksRepository = {
 
   // Dashboard stats
   getTaskStats: async () => {
-    const [total, todo, inProgress, completed] = await Promise.all([
+    const [total, todo, inProgress, completed, high, medium, normal, low] = await Promise.all([
       prisma.task.count({ where: { isTrashed: false } }),
       prisma.task.count({ where: { stage: "TODO", isTrashed: false } }),
       prisma.task.count({ where: { stage: "IN_PROGRESS", isTrashed: false } }),
       prisma.task.count({ where: { stage: "COMPLETED", isTrashed: false } }),
+      prisma.task.count({ where: { priority: "HIGH", isTrashed: false } }),
+      prisma.task.count({ where: { priority: "MEDIUM", isTrashed: false } }),
+      prisma.task.count({ where: { priority: "NORMAL", isTrashed: false } }),
+      prisma.task.count({ where: { priority: "LOW", isTrashed: false } }),
     ]);
 
-    return { total, todo, inProgress, completed };
+    return {
+      total,
+      todo,
+      inProgress,
+      completed,
+      priorities: { high, medium, normal, low },
+    };
   },
 };
 

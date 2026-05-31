@@ -3,7 +3,8 @@ import { MdAdminPanelSettings } from "react-icons/md";
 import { LuClipboardEdit } from "react-icons/lu";
 import { FaNewspaper } from "react-icons/fa";
 import { FaArrowsToDot } from "react-icons/fa6";
-import { summary } from "../assets/data";
+import { useGetDashboardStatsQuery } from "../redux/slices/taskApiSlice";
+import Loading from "../components/Loader";
 import clsx from "clsx";
 import { Chart } from "../components/Chart";
 import { TaskTable, UserTable } from "../components/dashboard";
@@ -13,13 +14,24 @@ import { useGetUsersQuery } from "../redux/slices/userApiSlice";
 const Dashboard = () => {
   const { user } = useSelector((state) => state.auth);
   const { data: usersData } = useGetUsersQuery(undefined, { skip: !user?.isAdmin });
-  const totals = summary.tasks;
+  const { data: dashboardData, isLoading } = useGetDashboardStatsQuery();
+
+  if (isLoading) {
+    return (
+      <div className='h-screen flex items-center justify-center'>
+        <Loading />
+      </div>
+    );
+  }
+
+  const summaryData = dashboardData?.data || {};
+  const totals = summaryData.tasks || {};
 
   const stats = [
     {
       _id: "1",
       label: "งานทั้งหมด",
-      total: summary?.totalTasks || 0,
+      total: summaryData?.totalTasks || 0,
       icon: <FaNewspaper />,
       bg: "bg-[#1d4ed8]",
     },
@@ -40,9 +52,9 @@ const Dashboard = () => {
     {
       _id: "4",
       label: "สิ่งที่ต้องทำ",
-      total: totals["todo"],
+      total: totals["todo"] || 0,
       icon: <FaArrowsToDot />,
-      bg: "bg-[#be185d]" || 0,
+      bg: "bg-[#be185d]",
     },
   ];
 
@@ -78,18 +90,18 @@ const Dashboard = () => {
         <h4 className="text-xl text-gray-600 font-semibold mb-10 ">
           กราฟแยกตามความสำคัญ
         </h4>
-        <Chart />
+        <Chart data={summaryData?.priorities} />
       </div>
 
       <div className="w-full flex flex-col md:flex-row gap-4 2xl:gap-10 py-8">
         {/* /left */}
 
-        <TaskTable tasks={summary.last10Task} isFullWidth={!user?.isAdmin} />
+        <TaskTable tasks={summaryData?.last10Task || []} isFullWidth={!user?.isAdmin} />
 
         {/* /right */}
 
         {user?.isAdmin && (
-          <UserTable users={usersData?.data || summary.users} />
+          <UserTable users={usersData?.data || []} />
         )}
       </div>
     </div>

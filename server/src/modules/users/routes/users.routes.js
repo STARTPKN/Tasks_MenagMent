@@ -11,18 +11,21 @@ import {
 
 const router = Router();
 
-// All user routes require authentication and admin role
+// All user routes require authentication
 router.use(protect);
-router.use(isAdmin);
 
+// Read-only routes: accessible to all authenticated users (for task assignment)
 router.get("/", usersController.getAllUsers);
 router.get("/:id", usersController.getUserById);
-router.post("/", validate(createUserSchema), usersController.createUser);
-router.put("/:id", validate(updateUserSchema), usersController.updateUser);
-router.delete("/:id", usersController.deleteUser);
-router.patch("/:id/status", usersController.toggleUserStatus);
+
+// Management routes: admin only
+router.post("/", isAdmin, validate(createUserSchema), usersController.createUser);
+router.put("/:id", isAdmin, validate(updateUserSchema), usersController.updateUser);
+router.delete("/:id", isAdmin, usersController.deleteUser);
+router.patch("/:id/status", isAdmin, usersController.toggleUserStatus);
 router.patch(
   "/:id/password",
+  isAdmin,
   validate(changePasswordSchema),
   usersController.changeUserPassword,
 );

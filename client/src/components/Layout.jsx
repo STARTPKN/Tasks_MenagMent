@@ -14,7 +14,7 @@ function Layout() {
 
   return user ? (
     <div className='w-full h-screen flex flex-col md:flex-row'>
-      <div className='w-1/5 h-screen bg-white sticky top-0 hidden md:block'>
+      <div className='w-64 h-screen bg-white sticky top-0 hidden md:block flex-shrink-0 border-r border-gray-100'>
         <Sidebar />
       </div>
 
@@ -48,32 +48,32 @@ const MobileSidebar = () => {
         show={isSidebarOpen}
         as={Fragment}
         enter='transition-opacity duration-700'
-        enterFrom='opacity-x-10'
-        enterTo='opacity-x-100'
+        enterFrom='opacity-0'
+        enterTo='opacity-100'
         leave='transition-opacity duration-700'
-        leaveFrom='opacity-x-100'
-        leaveTo='opacity-x-0'
+        leaveFrom='opacity-100'
+        leaveTo='opacity-0'
       >
         {(ref) => (
           <div
             ref={(node) => (mobileMenuRef.current = node)}
             className={clsx(
-              "md:hidden w-full h-full bg-black/40 transition-all duration-700 transform ",
+              "fixed inset-0 z-50 md:hidden w-full h-full bg-black/40 transition-all duration-700 transform ",
               isSidebarOpen ? "translate-x-0" : "translate-x-full"
             )}
             onClick={() => closeSidebar()}
           >
-            <div className='bg-white w-3/4 h-full'>
+            <div className='bg-white w-3/4 h-full shadow-2xl flex flex-col'>
               <div className='w-full flex justify-end px-5 mt-5'>
                 <button
                   onClick={() => closeSidebar()}
-                  className='flex justify-end items-end'
+                  className='flex justify-end items-end p-2 text-gray-500 hover:text-gray-900 transition-colors'
                 >
                   <IoClose size={25} />
                 </button>
               </div>
 
-              <div className='-mt-10'>
+              <div className='-mt-12 flex-1'>
                 <Sidebar />
               </div>
             </div>

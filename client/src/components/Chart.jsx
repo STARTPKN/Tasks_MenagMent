@@ -9,9 +9,27 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { chartData } from "../assets/data";
 
-export const Chart = () => {
+export const Chart = ({ data }) => {
+  const chartData = [
+    {
+      name: "สูง",
+      total: data?.high || 0,
+    },
+    {
+      name: "ปานกลาง",
+      total: data?.medium || 0,
+    },
+    {
+      name: "ปกติ",
+      total: data?.normal || 0,
+    },
+    {
+      name: "ต่ำ",
+      total: data?.low || 0,
+    },
+  ];
+
   return (
     <ResponsiveContainer width={"100%"} height={300}>
       <BarChart width={150} height={40} data={chartData}>

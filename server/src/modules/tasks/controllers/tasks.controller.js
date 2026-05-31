@@ -23,7 +23,7 @@ export const tasksController = {
 
   createTask: async (req, res, next) => {
     try {
-      const task = await tasksService.createTask(req.body);
+      const task = await tasksService.createTask(req.body, req.user);
       apiSuccess(res, "Task created successfully", task, 201);
     } catch (error) {
       next(error);
@@ -32,7 +32,7 @@ export const tasksController = {
 
   updateTask: async (req, res, next) => {
     try {
-      const task = await tasksService.updateTask(req.params.id, req.body);
+      const task = await tasksService.updateTask(req.params.id, req.body, req.user);
       apiSuccess(res, "Task updated successfully", task);
     } catch (error) {
       next(error);
@@ -126,7 +126,8 @@ export const tasksController = {
       const activity = await tasksService.createActivity(
         req.params.id,
         req.user.id,
-        req.body
+        req.body,
+        req.user
       );
       apiSuccess(res, "Activity posted successfully", activity, 201);
     } catch (error) {
