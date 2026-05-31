@@ -71,9 +71,10 @@ const Table = ({ tasks }) => {
       <tr className="w-full text-black  text-left">
         <th className="py-2">ชื่องาน</th>
         <th className="py-2">ความสำคัญ</th>
-        <th className="py-2 line-clamp-1">สร้างเมื่อ</th>
-        <th className="py-2">ไฟล์แนบ</th>
-        <th className="py-2">ทีม</th>
+        <th className="py-2 hidden md:table-cell line-clamp-1">สร้างเมื่อ</th>
+        <th className="py-2 hidden md:table-cell">ไฟล์แนบ</th>
+        <th className="py-2 hidden sm:table-cell">ทีม</th>
+        {(canEdit || canDelete) && <th className="py-2 text-right">จัดการ</th>}
       </tr>
     </thead>
   );
@@ -104,13 +105,13 @@ const Table = ({ tasks }) => {
           </div>
         </td>
 
-        <td className="py-2">
+        <td className="py-2 hidden md:table-cell">
           <span className="text-sm text-gray-600">
             {formatThaiDateTime(task?.date)}
           </span>
         </td>
 
-        <td className="py-2">
+        <td className="py-2 hidden md:table-cell">
           <div className="flex items-center gap-3">
             <div className="flex gap-1 items-center text-sm text-gray-600">
               <BiMessageAltDetail />
@@ -127,11 +128,11 @@ const Table = ({ tasks }) => {
           </div>
         </td>
 
-        <td className="py-2">
+        <td className="py-2 hidden sm:table-cell">
           <div className="flex">
             {task?.team?.map((m, index) => (
               <div
-                key={m._id}
+                key={m?._id || index}
                 className={clsx(
                   "w-7 h-7 rounded-full text-white flex items-center justify-center text-sm -mr-1",
                   BGS[index % BGS?.length],
@@ -178,7 +179,7 @@ const Table = ({ tasks }) => {
             <TableHeader />
             <tbody>
               {tasks.map((task, index) => (
-                <TableRow key={index} task={task} />
+                <TableRow key={task?._id || index} task={task} />
               ))}
             </tbody>
           </table>
