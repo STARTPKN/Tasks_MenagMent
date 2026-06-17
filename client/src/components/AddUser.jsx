@@ -50,7 +50,7 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
         // Self-Profile Update: only send name and title
         const res = await updateProfile({
           name: data.name,
-          title: data.title,
+          title: data.title || userData?.title,
         }).unwrap();
 
         const updatedUser = res?.data || res;
@@ -125,10 +125,11 @@ const AddUser = ({ open, setOpen, userData, isProfile = false }) => {
               ) : (
                 <select
                   name="title"
+                  disabled={isProfile && user?.role === "USER"}
                   {...register("title", {
-                    required: "กรุณาระบุตำแหน่ง!",
+                    required: (isProfile && user?.role === "USER") ? false : "กรุณาระบุตำแหน่ง!",
                   })}
-                  className="w-full rounded px-3 py-2 border border-gray-300 text-sm focus:ring-1 focus:ring-blue-600 outline-none"
+                  className="w-full rounded px-3 py-2 border border-gray-300 text-sm focus:ring-1 focus:ring-blue-600 outline-none disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-500"
                 >
                   <option value="">-- เลือกตำแหน่ง --</option>
                   {positionsList.map((pos) => (

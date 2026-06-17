@@ -41,15 +41,15 @@ const ChangePassword = ({ open, setOpen }) => {
           as="h2"
           className="text-base font-bold leading-6 text-gray-900 mb-2"
         >
-          CHANGE PASSWORD
+          เปลี่ยนรหัสผผ่าน
         </Dialog.Title>
 
         <div className="flex flex-col gap-5">
           <Textbox
-            placeholder="Enter current password"
+            placeholder="รหัสผผ่านปัจจุบัน"
             type="password"
             name="currentPassword"
-            label="Current Password"
+            label="รหัสผผ่านปัจจุบัน"
             className="w-full rounded"
             register={register("currentPassword", {
               required: "Current password is required!",
@@ -58,10 +58,10 @@ const ChangePassword = ({ open, setOpen }) => {
           />
 
           <Textbox
-            placeholder="Enter new password"
+            placeholder="รหัสผ่านใหม่"
             type="password"
             name="newPassword"
-            label="New Password"
+            label="รหัสผ่านใหม่"
             className="w-full rounded"
             register={register("newPassword", {
               required: "New password is required!",
@@ -74,10 +74,10 @@ const ChangePassword = ({ open, setOpen }) => {
           />
 
           <Textbox
-            placeholder="Confirm new password"
+            placeholder="ยืนยันรหัสผ่าน"
             type="password"
             name="confirmPassword"
-            label="Confirm New Password"
+            label="ยืนยันรหัสผ่าน"
             className="w-full rounded"
             register={register("confirmPassword", {
               required: "Confirming new password is required!",
