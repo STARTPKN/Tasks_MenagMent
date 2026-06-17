@@ -24,21 +24,23 @@ const linkData = [
     link: "tasks",
     icon: <FaTasks />,
   },
-  {
-    label: "เสร็จสิ้น",
-    link: "completed/completed",
-    icon: <MdTaskAlt />,
+   {
+    label: "ที่ต้องทำ",
+    link: "todo/todo",
+    icon: <MdOutlineAssignment />,
   },
-  {
+    {
     label: "กำลังดำเนินการ",
     link: "in-progress/in progress",
     icon: <MdOutlinePendingActions />,
   },
   {
-    label: "ที่ต้องทำ",
-    link: "todo/todo",
-    icon: <MdOutlineAssignment />,
+    label: "เสร็จสิ้น",
+    link: "completed/completed",
+    icon: <MdTaskAlt />,
   },
+
+ 
   {
     label: "จัดการทีมงาน",
     link: "team",
