@@ -4,11 +4,11 @@ import { getInitials } from "../utils";
 
 const UserInfo = ({ user }) => {
   return (
-    <div className='px-4'>
-      <Popover className='relative'>
+    <div className="w-full h-full">
+      <Popover className='relative w-full h-full'>
         {/* {({ open }) => ( */}
         <>
-          <Popover.Button className='group inline-flex items-center outline-none'>
+          <Popover.Button className='w-full h-full group flex items-center justify-center outline-none'>
             <span>{getInitials(user?.name)}</span>
           </Popover.Button>
 
@@ -21,17 +21,17 @@ const UserInfo = ({ user }) => {
             leaveFrom='opacity-100 translate-y-0'
             leaveTo='opacity-0 translate-y-1'
           >
-            <Popover.Panel className='absolute left-1/2 z-10 mt-3 w-80 max-w-sm -translate-x-1/2 transform px-4 sm:px-0 '>
-              <div className='flex items-center gap-4 rounded-lg shadow-lg bg-white p-8'>
-                <div className='w-16 h-16 bg-blue-600 rounded-full text-white flex items-center justify-center text-2xl '>
+            <Popover.Panel className='absolute z-50 mt-2 w-max -translate-x-3/4 px-4 sm:px-0 '>
+              <div className='flex items-center gap-4 rounded-lg shadow-lg bg-white p-4 border border-gray-100'>
+                <div className='w-14 h-14 bg-blue-600 rounded-full text-white flex items-center justify-center text-xl'>
                   <span className='text-center font-bold'>
                     {getInitials(user?.name)}
                   </span>
                 </div>
-                <div className='flex flex-col gap-y-1'>
-                  <p className='text-black text-xl font-bold'>{user?.name}</p>
-                  <span className='text-base text-gray-500'>{user?.title}</span>
-                  <span className='text-blue-500'>
+                <div className='flex flex-col gap-y-1 text-left'>
+                  <p className='text-black text-base font-bold'>{user?.name}</p>
+                  <span className='text-sm text-gray-500'>{user?.title}</span>
+                  <span className='text-sm text-blue-500'>
                     {user?.email ?? "email@example.com"}
                   </span>
                 </div>

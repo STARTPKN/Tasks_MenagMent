@@ -173,8 +173,8 @@ const Table = ({ tasks }) => {
 
   return (
     <>
-      <div className="bg-white  px-2 md:px-4 pt-4 pb-9 shadow-md rounded">
-        <div className="overflow-x-auto">
+      <div className="bg-white px-2 md:px-4 pt-4 pb-9 shadow-md rounded">
+        <div className="w-full overflow-visible">
           <table className="w-full ">
             <TableHeader />
             <tbody>
