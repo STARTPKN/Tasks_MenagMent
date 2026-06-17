@@ -108,6 +108,21 @@ export const taskApiSlice = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Tasks"],
     }),
+    updateTaskActivity: builder.mutation({
+      query: ({ activityId, data }) => ({
+        url: `/tasks/activities/${activityId}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
+    deleteTaskActivity: builder.mutation({
+      query: (activityId) => ({
+        url: `/tasks/activities/${activityId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Tasks"],
+    }),
   }),
 });
 
@@ -126,5 +141,7 @@ export const {
   useRestoreTaskMutation,
   useRestoreAllTasksMutation,
   useDeleteAllTrashedMutation,
+  useUpdateTaskActivityMutation,
+  useDeleteTaskActivityMutation,
 } = taskApiSlice;
 

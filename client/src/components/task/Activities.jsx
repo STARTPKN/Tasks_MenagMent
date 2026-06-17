@@ -2,11 +2,18 @@ import React, { useState } from "react";
 import moment from "moment";
 import { FaBug, FaThumbsUp, FaUser } from "react-icons/fa";
 import { GrInProgress } from "react-icons/gr";
-import { MdOutlineDoneAll, MdOutlineMessage } from "react-icons/md";
+import { MdOutlineDoneAll, MdOutlineMessage, MdOutlineEdit } from "react-icons/md";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { useSelector } from "react-redux";
 import Loading from "../Loader";
 import Button from "../Button";
 import { toast } from "sonner";
-import { usePostTaskActivityMutation } from "../../redux/slices/taskApiSlice";
+import {
+  usePostTaskActivityMutation,
+  useUpdateTaskActivityMutation,
+  useDeleteTaskActivityMutation,
+} from "../../redux/slices/taskApiSlice";
+import ConfirmatioDialog from "../Dialogs";
 
 const TASKTYPEICON = {
   commented: (
@@ -75,9 +82,19 @@ const MAP_THAI_TO_ENG = {
 };
 
 const Activities = ({ activity, id }) => {
+  const { user } = useSelector((state) => state.auth);
+
   const [selected, setSelected] = useState(act_types[0]);
   const [text, setText] = useState("");
+
+  const [editingId, setEditingId] = useState(null);
+  const [editText, setEditText] = useState("");
+  const [openDelete, setOpenDelete] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
   const [postActivity, { isLoading }] = usePostTaskActivityMutation();
+  const [updateActivity, { isLoading: isUpdating }] = useUpdateTaskActivityMutation();
+  const [deleteActivity, { isLoading: isDeleting }] = useDeleteTaskActivityMutation();
 
   const handleSubmit = async () => {
     if (!text.trim()) {
@@ -101,25 +118,117 @@ const Activities = ({ activity, id }) => {
     }
   };
 
-  const Card = ({ item }) => {
+  const handleEditClick = (item) => {
+    setEditingId(item.id || item._id);
+    setEditText(item.activity);
+  };
+
+  const handleSaveEdit = async (activityId) => {
+    if (!editText.trim()) {
+      toast.error("กรุณากรอกข้อความกิจกรรม");
+      return;
+    }
+    try {
+      await updateActivity({
+        activityId,
+        data: { activity: editText },
+      }).unwrap();
+      toast.success("แก้ไขกิจกรรมสำเร็จ!");
+      setEditingId(null);
+    } catch (err) {
+      toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาดในการแก้ไขกิจกรรม");
+    }
+  };
+
+  const handleDeleteClick = (activityId) => {
+    setDeletingId(activityId);
+    setOpenDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteActivity(deletingId).unwrap();
+      toast.success("ลบกิจกรรมสำเร็จ!");
+      setOpenDelete(false);
+      setDeletingId(null);
+    } catch (err) {
+      toast.error(err?.data?.message || err?.error || "เกิดข้อผิดพลาดในการลบกิจกรรม");
+    }
+  };
+
+  const Card = ({ item, isConnected }) => {
+    const isOwnerOrAdmin = item?.byUserId === user?.id || item?.by?.id === user?.id || user?.role === "ADMIN";
+    const isEditing = editingId === item?.id || editingId === item?._id;
+
     return (
-      <div className='flex space-x-4'>
+      <div className='flex space-x-4 w-full group'>
         <div className='flex flex-col items-center flex-shrink-0'>
           <div className='w-10 h-10 flex items-center justify-center'>
             {TASKTYPEICON[item?.type]}
           </div>
-          <div className='w-full flex items-center'>
-            <div className='w-0.5 bg-gray-300 h-full'></div>
+          <div className='w-full flex items-center justify-center flex-grow'>
+            {isConnected && <div className='w-0.5 bg-gray-200 h-full min-h-[40px]'></div>}
           </div>
         </div>
 
-        <div className='flex flex-col gap-y-1 mb-8'>
-          <p className='font-semibold'>{item?.by?.name}</p>
-          <div className='text-gray-500 space-y-2'>
-            <span className='capitalize'>{ACT_TYPES_THAI[item?.type] || item?.type}</span>
-            <span className='text-sm'>{moment(item?.date).fromNow()}</span>
+        <div className='flex flex-col gap-y-1 mb-8 flex-grow w-full'>
+          <div className='flex justify-between items-start w-full gap-2'>
+            <div>
+              <p className='font-semibold text-gray-800'>{item?.by?.name}</p>
+              <div className='text-gray-400 text-xs flex gap-2 items-center mt-0.5'>
+                <span className='capitalize font-medium px-2 py-0.5 bg-slate-100 rounded text-slate-600'>{ACT_TYPES_THAI[item?.type] || item?.type}</span>
+                <span>•</span>
+                <span>{moment(item?.date).fromNow()}</span>
+              </div>
+            </div>
+
+            {/* Action buttons (only show if owner/admin and not currently editing) */}
+            {isOwnerOrAdmin && !isEditing && (
+              <div className='flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
+                <button
+                  onClick={() => handleEditClick(item)}
+                  className='p-1 rounded text-gray-500 hover:bg-gray-100 hover:text-blue-600 transition-colors'
+                  title='แก้ไขกิจกรรม'
+                >
+                  <MdOutlineEdit size={16} />
+                </button>
+                <button
+                  onClick={() => handleDeleteClick(item?.id || item?._id)}
+                  className='p-1 rounded text-gray-500 hover:bg-gray-100 hover:text-red-600 transition-colors'
+                  title='ลบกิจกรรม'
+                >
+                  <RiDeleteBin6Line size={16} />
+                </button>
+              </div>
+            )}
           </div>
-          <div className='text-gray-700'>{item?.activity}</div>
+
+          {isEditing ? (
+            <div className='mt-2 w-full space-y-2'>
+              <textarea
+                value={editText}
+                onChange={(e) => setEditText(e.target.value)}
+                rows={3}
+                className='w-full p-2 border border-blue-400 rounded outline-none focus:ring-1 ring-blue-500 bg-white text-base text-gray-800'
+              />
+              <div className='flex gap-2 justify-end'>
+                <Button
+                  type='button'
+                  label={isUpdating ? "กำลังบันทึก..." : "บันทึก"}
+                  onClick={() => handleSaveEdit(item?.id || item?._id)}
+                  className='bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700 font-semibold'
+                />
+                <Button
+                  type='button'
+                  label='ยกเลิก'
+                  onClick={() => setEditingId(null)}
+                  className='bg-white border text-gray-700 px-3 py-1 text-sm rounded hover:bg-gray-50 font-semibold'
+                />
+              </div>
+            </div>
+          ) : (
+            <div className='text-gray-700 text-base mt-2 whitespace-pre-line bg-gray-50/50 p-2.5 rounded border border-gray-100/50'>{item?.activity}</div>
+          )}
         </div>
       </div>
     );
@@ -176,6 +285,12 @@ const Activities = ({ activity, id }) => {
           )}
         </div>
       </div>
+
+      <ConfirmatioDialog
+        open={openDelete}
+        setOpen={setOpenDelete}
+        onClick={handleConfirmDelete}
+      />
     </div>
   );
 };

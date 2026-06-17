@@ -7,7 +7,7 @@ import {
   MdKeyboardDoubleArrowUp,
 } from "react-icons/md";
 import { useSelector } from "react-redux";
-import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate, PRIORITY_THAI, formatThaiDateTime } from "../utils";
+import { BGS, PRIOTITYSTYELS, TASK_TYPE, formatDate, PRIORITY_THAI, formatThaiDateTime, formatThaiDate } from "../utils";
 import TaskDialog from "./task/TaskDialog";
 import { BiMessageAltDetail } from "react-icons/bi";
 import { FaList } from "react-icons/fa";
@@ -98,9 +98,9 @@ const TaskCard = ({ task }) => {
 
             <div className='p-4 space-x-8'>
               <span className='text-sm text-gray-600'>
-                {formatDate(new Date(task?.subTasks[0]?.date))}
+                {formatThaiDate(task?.subTasks[0]?.date)}
               </span>
-              <span className='bg-blue-600/10 px-3 py-1 rounded0full text-blue-700 font-medium'>
+              <span className='bg-blue-600/10 px-2 py-0.5 rounded-full text-blue-700 font-medium text-xs whitespace-nowrap'>
                 {task?.subTasks[0].tag}
               </span>
             </div>

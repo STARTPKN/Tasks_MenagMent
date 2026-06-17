@@ -18,6 +18,7 @@ const AddSubTask = ({ open, setOpen, id, subTask = null }) => {
       title: subTask?.title || "",
       date: subTask?.date ? subTask.date.split("T")[0] : "",
       tag: subTask?.tag || "",
+      description: subTask?.description || "",
     },
   });
 
@@ -31,6 +32,7 @@ const AddSubTask = ({ open, setOpen, id, subTask = null }) => {
       title: subTask?.title || "",
       date: subTask?.date ? subTask.date.split("T")[0] : "",
       tag: subTask?.tag || "",
+      description: subTask?.description || "",
     });
   }, [subTask, open, reset]);
 
@@ -94,6 +96,19 @@ const AddSubTask = ({ open, setOpen, id, subTask = null }) => {
                   required: "กรุณากรอกแท็ก!",
                 })}
                 error={errors.tag ? errors.tag.message : ""}
+              />
+            </div>
+
+            <div className='w-full flex flex-col gap-1'>
+              <label htmlFor='description' className='text-slate-800 text-sm font-semibold'>
+                รายละเอียดงานย่อย
+              </label>
+              <textarea
+                id='description'
+                placeholder='รายละเอียดการดำเนินงานย่อย...'
+                rows={3}
+                {...register("description")}
+                className='w-full bg-transparent px-3 py-2.5 border border-gray-300 placeholder-gray-400 text-gray-900 outline-none text-base focus:ring-2 ring-blue-300 rounded'
               />
             </div>
           </div>

@@ -176,13 +176,18 @@ const TaskDetails = () => {
                                 {formatThaiDate(el?.date)}
                               </span>
 
-                              <span className='px-2 py-0.5 text-center text-sm rounded-full bg-violet-100 text-violet-700 font-semibold'>
+                              <span className='px-2 py-0.5 text-center text-xs whitespace-nowrap rounded-full bg-violet-100 text-violet-700 font-semibold'>
                                 {el?.tag}
                               </span>
                             </div>
 
-                            <p className='text-gray-700 font-medium'>{el?.title}</p>
-                          </div>
+                             <p className='text-gray-700 font-medium'>{el?.title}</p>
+                             {el?.description && (
+                               <p className='text-sm text-gray-500 mt-1 whitespace-pre-line border-l-2 border-violet-300 pl-3 py-0.5 bg-gray-50/50 rounded-r'>
+                                 {el?.description}
+                               </p>
+                             )}
+                           </div>
                         </div>
 
                         {/* Edit and Delete Actions dropdown */}
