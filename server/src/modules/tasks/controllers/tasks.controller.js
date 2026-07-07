@@ -50,7 +50,7 @@ export const tasksController = {
 
   restoreTask: async (req, res, next) => {
     try {
-      await tasksService.restoreTask(req.params.id);
+      await tasksService.restoreTask(req.params.id, req.user);
       apiSuccess(res, "Task restored successfully", null);
     } catch (error) {
       next(error);
@@ -59,7 +59,7 @@ export const tasksController = {
 
   deleteTask: async (req, res, next) => {
     try {
-      await tasksService.deleteTask(req.params.id);
+      await tasksService.deleteTask(req.params.id, req.user);
       apiSuccess(res, "Task permanently deleted", null);
     } catch (error) {
       next(error);
@@ -130,6 +130,33 @@ export const tasksController = {
         req.user
       );
       apiSuccess(res, "Activity posted successfully", activity, 201);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  updateActivity: async (req, res, next) => {
+    try {
+      const activity = await tasksService.updateActivity(
+        req.params.activityId,
+        req.user.id,
+        req.body,
+        req.user.role
+      );
+      apiSuccess(res, "Activity updated successfully", activity);
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  deleteActivity: async (req, res, next) => {
+    try {
+      await tasksService.deleteActivity(
+        req.params.activityId,
+        req.user.id,
+        req.user.role
+      );
+      apiSuccess(res, "Activity deleted successfully", null);
     } catch (error) {
       next(error);
     }

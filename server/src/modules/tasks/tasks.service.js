@@ -3,6 +3,14 @@ import tasksRepository from "./tasks.repository.js";
 import notificationsService from "../notifications/notifications.service.js";
 import settingsService from "../settings/settings.service.js";
 
+const assertTaskAccess = (task, currentUser) => {
+  if (currentUser?.role === "ADMIN") return;
+  const isMember = task.team?.some((member) => member.id === currentUser?.id);
+  if (!isMember) {
+    throw new AppError("คุณไม่มีสิทธิ์เข้าถึงงานนี้", 403);
+  }
+};
+
 export const tasksService = {
   getAllTasks: async (stage) => {
     const filter = { isTrashed: false };
@@ -63,6 +71,7 @@ export const tasksService = {
     if (!task) {
       throw new AppError("Task not found", 404);
     }
+    assertTaskAccess(task, currentUser);
 
     const updateData = {};
     if (data.title) updateData.title = data.title;
@@ -102,22 +111,25 @@ export const tasksService = {
     if (!task) {
       throw new AppError("Task not found", 404);
     }
+    assertTaskAccess(task, currentUser);
     return tasksRepository.trash(id);
   },
 
-  restoreTask: async (id) => {
+  restoreTask: async (id, currentUser) => {
     const task = await tasksRepository.findById(id);
     if (!task) {
       throw new AppError("Task not found", 404);
     }
+    assertTaskAccess(task, currentUser);
     return tasksRepository.restore(id);
   },
 
-  deleteTask: async (id) => {
+  deleteTask: async (id, currentUser) => {
     const task = await tasksRepository.findById(id);
     if (!task) {
       throw new AppError("Task not found", 404);
     }
+    assertTaskAccess(task, currentUser);
     return tasksRepository.delete(id);
   },
 
@@ -149,6 +161,7 @@ export const tasksService = {
     const subTaskData = {
       title: data.title,
       tag: data.tag,
+      description: data.description,
     };
 
     if (data.date) {
@@ -167,6 +180,7 @@ export const tasksService = {
     const subTaskData = {
       title: data.title,
       tag: data.tag,
+      description: data.description,
     };
 
     if (data.date) {
@@ -207,6 +221,30 @@ export const tasksService = {
     }
 
     return activity;
+  },
+
+  updateActivity: async (activityId, userId, data, userRole) => {
+    const activity = await tasksRepository.findActivityById(activityId);
+    if (!activity) {
+      throw new AppError("Activity not found", 404);
+    }
+    if (activity.byUserId !== userId && userRole !== "ADMIN") {
+      throw new AppError("ไม่สามารถแก้ไขกิจกรรมของผู้อื่นได้", 403);
+    }
+    return tasksRepository.updateActivity(activityId, {
+      activity: data.activity,
+    });
+  },
+
+  deleteActivity: async (activityId, userId, userRole) => {
+    const activity = await tasksRepository.findActivityById(activityId);
+    if (!activity) {
+      throw new AppError("Activity not found", 404);
+    }
+    if (activity.byUserId !== userId && userRole !== "ADMIN") {
+      throw new AppError("ไม่สามารถลบกิจกรรมของผู้อื่นได้", 403);
+    }
+    return tasksRepository.deleteActivity(activityId);
   },
 
   getDashboard: async () => {

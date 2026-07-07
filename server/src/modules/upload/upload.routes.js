@@ -36,9 +36,38 @@ const multerErrorHandler = (err, req, res, next) => {
   next();
 };
 
+// อนุญาตเฉพาะประเภทไฟล์ที่ใช้งานจริงในระบบ (เอกสาร/รูปภาพ/วิดีโอทั่วไป)
+const ALLOWED_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/svg+xml",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "text/csv",
+  "application/zip",
+  "video/mp4",
+  "video/quicktime",
+]);
+
+const fileFilter = (req, file, cb) => {
+  if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+    return cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", `File type ${file.mimetype} is not allowed`));
+  }
+  cb(null, true);
+};
+
 const upload = multer({
   storage,
   limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit
+  fileFilter,
 });
 
 const checkFileUploadSetting = async (req, res, next) => {

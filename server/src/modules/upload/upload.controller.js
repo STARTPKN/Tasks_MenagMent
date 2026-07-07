@@ -2,6 +2,8 @@ import {
   uploadToCloudinary,
   deleteFromCloudinary,
 } from "../../utils/cloudinary/uploader.js";
+import { AppError } from "../../utils/index.js";
+import prisma from "../../config/prisma.js";
 
 /**
  * Upload single file to Cloudinary
@@ -19,10 +21,7 @@ export const uploadFile = async (req, res, next) => {
 
     if (!req.file) {
       console.warn("⚠️ No file provided in request");
-      return res.status(400).json({
-        status: "fail",
-        message: "No file provided",
-      });
+      throw new AppError("No file provided", 400);
     }
 
     const folder = req.body?.folder || "task-manager/files";
@@ -31,10 +30,7 @@ export const uploadFile = async (req, res, next) => {
 
     if (!fileBuffer || fileBuffer.length === 0) {
       console.warn("⚠️ File buffer is empty");
-      return res.status(400).json({
-        status: "fail",
-        message: "File is empty",
-      });
+      throw new AppError("File is empty", 400);
     }
 
     console.log(`📁 Uploading to folder: ${folder}`);
@@ -78,10 +74,7 @@ export const uploadMultipleFiles = async (req, res, next) => {
 
     if (!req.files || req.files.length === 0) {
       console.warn("⚠️ No files provided in request");
-      return res.status(400).json({
-        status: "fail",
-        message: "No files provided",
-      });
+      throw new AppError("No files provided", 400);
     }
 
     const folder = req.body?.folder || "task-manager/files";
@@ -126,10 +119,22 @@ export const deleteFile = async (req, res, next) => {
     const { publicId } = req.body;
 
     if (!publicId) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Public ID is required",
-      });
+      throw new AppError("Public ID is required", 400);
+    }
+
+    // ถ้าไฟล์นี้ถูกผูกกับ task อยู่แล้ว ต้องเป็น admin หรือสมาชิกใน team ของ task นั้นเท่านั้น
+    const linkedAsset = await prisma.asset.findFirst({
+      where: { url: { contains: publicId } },
+      include: { task: { include: { team: true } } },
+    });
+
+    if (linkedAsset && req.user?.role !== "ADMIN") {
+      const isMember = linkedAsset.task.team.some(
+        (member) => member.id === req.user?.id
+      );
+      if (!isMember) {
+        throw new AppError("คุณไม่มีสิทธิ์ลบไฟล์นี้", 403);
+      }
     }
 
     const result = await deleteFromCloudinary(publicId);

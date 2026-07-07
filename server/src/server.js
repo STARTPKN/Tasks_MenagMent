@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import morgan from "morgan";
 import dotenv from "dotenv";
 import routes from "./routes/index.js";
@@ -11,8 +12,25 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8800;
 
+// อนุญาตเฉพาะ origin ที่กำหนดใน env (คั่นด้วย comma) ถ้าไม่ตั้งค่าจะ fallback ไปที่ dev server ทั่วไป
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173,http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // อนุญาต request ที่ไม่มี origin (เช่น server-to-server, curl, mobile app)
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
+};
+
 // Global Middlewares
-app.use(cors());
+app.use(helmet());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true }));
 

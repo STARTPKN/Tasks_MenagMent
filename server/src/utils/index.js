@@ -1,5 +1,13 @@
 import jwt from "jsonwebtoken";
 
+const getJwtSecret = () => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT_SECRET environment variable is required");
+  }
+  return secret;
+};
+
 export class AppError extends Error {
   constructor(message, statusCode) {
     super(message);
@@ -12,13 +20,13 @@ export class AppError extends Error {
 }
 
 export const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET || "fallbacksecret", {
+  return jwt.sign({ id: userId }, getJwtSecret(), {
     expiresIn: "30d",
   });
 };
 
 export const verifyToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET || "fallbacksecret");
+  return jwt.verify(token, getJwtSecret());
 };
 
 export const apiSuccess = (res, message, data, statusCode = 200) => {
